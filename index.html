@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauna C y G - Sistema de Reservas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <header class="modern-header" style="display: none;">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Sauna C y G</h1>
+                    <span>Relajación y Bienestar</span>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <a href="#registro-cliente" class="nav-link" id="nav-cliente">
+                    <i class="fas fa-user"></i>
+                    <span id="nav-cliente-text">Mi Cuenta</span>
+                </a>
+                <a href="#reservas" class="nav-link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="#productos" class="nav-link">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Productos</span>
+                </a>
+                <button id="carrito-btn" class="cart-button">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Mi Carrito</span>
+                    <div class="cart-badge" id="carrito-count">0</div>
+                </button>
+                <button id="registro-btn" class="register-button" onclick="mostrarRegistro()">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registrarse</span>
+                </button>
+                <button id="theme-btn" class="theme-button" onclick="toggleTema()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">Modo Oscuro</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Página de Bienvenida -->
+    <section id="welcome-page" class="welcome-page">
+        <div class="welcome-container">
+            <div class="welcome-image">
+                <img src="p2.jpg" alt="Sauna C y G - Bienvenidos" class="welcome-img">
+                <div class="welcome-overlay">
+                    <div class="welcome-content">
+                        <h1>¡Bienvenidos a Sauna C y G!</h1>
+                        <p>Tu oasis de relajación y bienestar te espera</p>
+                        <p class="welcome-subtitle">Disfruta de la mejor experiencia de sauna con nuestros módulos
+                            premium</p>
+                        <button id="btn-iniciar" class="btn-welcome">
+                            <i class="fas fa-play"></i>
+                            Comenzar mi Experiencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content" id="main-app" style="display: none;">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Experimenta la Relajación Total</h2>
+                    <p>Disfruta de nuestros módulos de sauna premium con la mejor tecnología y comodidad</p>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Vista de Saunas Disponibles -->
+        <section class="saunas-disponibles-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2><i class="fas fa-spa"></i> Estado Actual de Nuestros Saunas</h2>
+                    <p>Consulta la disponibilidad en tiempo real de todos nuestros módulos</p>
+                </div>
+
+                <div class="saunas-status-grid" id="saunas-status-grid">
+                    <!-- Los saunas se cargarán dinámicamente -->
+                </div>
+
+                <div class="status-legend">
+                    <div class="legend-item">
+                        <div class="status-indicator disponible"></div>
+                        <span>Disponible Ahora</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator ocupado"></div>
+                        <span>En Uso</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator reservado"></div>
+                        <span>Reservado</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="status-indicator mantenimiento"></div>
+                        <span>Mantenimiento</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Reservas -->
+        <section id="reservas" class="section reservas-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Reserva tu Módulo de Sauna</h2>
+                    <p>Selecciona el módulo perfecto para tu experiencia de relajación</p>
+                </div>
+
+                <div class="reserva-form-container">
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <span>Personas</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <span>Módulo</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <span>Horario</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-number">4</div>
+                            <span>Información</span>
+                        </div>
+                    </div>
+
+                    <div class="form-step active" id="step-1">
+                        <h3>¿Cuántas personas disfrutarán del sauna?</h3>
+                        <div class="personas-grid">
+                            <div class="persona-option" data-value="1-adulto">
+                                <i class="fas fa-user"></i>
+                                <span>1 Adulto</span>
+                                <small>Solo</small>
+                            </div>
+                            <div class="persona-option" data-value="1-adulto-1-niño">
+                                <i class="fas fa-user-friends"></i>
+                                <span>1 Adulto + 1 Niño</span>
+                                <small>Menor de 8 años</small>
+                            </div>
+                            <div class="persona-option" data-value="2-adultos">
+                                <i class="fas fa-users"></i>
+                                <span>2 Adultos</span>
+                                <small>Pareja</small>
+                            </div>
+                            <div class="persona-option" data-value="2-adultos-1-niño">
+                                <i class="fas fa-users"></i>
+                                <span>2 Adultos + 1 Niño</span>
+                                <small>Familia pequeña</small>
+                            </div>
+                            <div class="persona-option" data-value="2-adultos-2-niños">
+                                <i class="fas fa-users"></i>
+                                <span>2 Adultos + 2 Niños</span>
+                                <small>Familia</small>
+                            </div>
+                            <div class="persona-option" data-value="3-4-adultos-niños">
+                                <i class="fas fa-user-friends"></i>
+                                <span>3-4 Adultos y/o Niños</span>
+                                <small>Grupo grande</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-step" id="step-2">
+                        <h3>Selecciona tu módulo ideal</h3>
+                        <div class="modulos-grid" id="modulos-grid">
+                            <!-- Los módulos se cargarán dinámicamente -->
+                        </div>
+
+                        <div class="additional-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="segunda-adquisicion">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">
+                                    <strong>Segunda adquisición</strong>
+                                    <small>Agregar otro módulo con las mismas opciones</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-step" id="step-3">
+                        <h3>Selecciona tu horario de visita</h3>
+                        <div class="horario-section">
+                            <div class="info-card">
+                                <i class="fas fa-clock"></i>
+                                <h4>Elige el horario que mejor te convenga</h4>
+                                <p>Selecciona la fecha y hora de tu visita. Los horarios están disponibles cada 30
+                                    minutos</p>
+                            </div>
+
+                            <div class="horario-selector">
+                                <div class="fecha-selector">
+                                    <label for="fecha-visita">Fecha de visita:</label>
+                                    <input type="date" id="fecha-visita" required>
+                                </div>
+
+                                <div class="hora-selector">
+                                    <label>Horario disponible:</label>
+                                    <div class="horarios-grid" id="horarios-grid">
+                                        <!-- Los horarios se cargarán dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-step" id="step-4">
+                        <h3>Información de salud (obligatorio)</h3>
+                        <div class="health-info-section">
+                            <div class="info-card">
+                                <i class="fas fa-shield-alt"></i>
+                                <h4>Tu seguridad es nuestra prioridad</h4>
+                                <p>Necesitamos conocer cualquier alergia para garantizar tu bienestar</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="alergias">¿Tienes alguna alergia a productos de limpieza o
+                                    sustancias?</label>
+                                <textarea id="alergias"
+                                    placeholder="Describe cualquier alergia conocida o escribe 'Ninguna'"
+                                    required></textarea>
+                                <div class="field-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    Esta información es confidencial y solo se usa para tu seguridad
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" id="prev-btn" class="btn-nav btn-secondary" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" id="next-btn" class="btn-nav btn-primary">
+                            Siguiente <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Productos -->
+        <section id="productos" class="section productos-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2><i class="fas fa-shopping-bag"></i> Productos Adicionales</h2>
+                    <p>Complementa tu experiencia con nuestros productos premium</p>
+                </div>
+
+                <div class="productos-filter">
+                    <button class="filter-btn active" data-categoria="todos">
+                        <i class="fas fa-th"></i> Todos
+                    </button>
+                    <button class="filter-btn" data-categoria="refrescos">
+                        <i class="fas fa-glass-whiskey"></i> Bebidas
+                    </button>
+                    <button class="filter-btn" data-categoria="shampus">
+                        <i class="fas fa-pump-soap"></i> Champús
+                    </button>
+                    <button class="filter-btn" data-categoria="implementos">
+                        <i class="fas fa-tshirt"></i> Implementos
+                    </button>
+                    <button class="filter-btn" data-categoria="dulces">
+                        <i class="fas fa-candy-cane"></i> Dulces
+                    </button>
+                </div>
+
+                <div class="productos-grid" id="productos-grid">
+                    <!-- Los productos se cargarán dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Carrito de Compras -->
+    <div id="carrito-modal" class="modal modern-modal">
+        <div class="modal-overlay" onclick="cerrarCarrito()"></div>
+        <div class="modal-content cart-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-shopping-cart"></i> Mi Carrito de Compras</h2>
+                <button class="close-btn" onclick="cerrarCarrito()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div id="carrito-items" class="cart-items">
+                    <!-- Los items se cargarán dinámicamente -->
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal-precio">0 Bs</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total a Pagar:</span>
+                        <span id="total-precio">0 Bs</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="payment-options">
+                    <button onclick="pagarEfectivo()" class="btn-payment cash">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Pagar en Efectivo</span>
+                    </button>
+                    <button onclick="pagarQR()" class="btn-payment qr">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Pagar con QR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QR -->
+    <div id="qr-modal" class="modal modern-modal">
+        <div class="modal-overlay" onclick="cerrarQR()"></div>
+        <div class="modal-content qr-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-qrcode"></i> Pago con Código QR</h2>
+                <button class="close-btn" onclick="cerrarQR()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="qr-container">
+                    <div class="qr-info-header">
+                        <h3>Escanea para Pagar</h3>
+                        <p class="qr-monto">Monto a pagar: <strong id="total-qr">0 Bs</strong></p>
+                    </div>
+
+                    <div class="qr-code-display" id="qr-code">
+                        <!-- La imagen QR se cargará aquí -->
+                        <img id="qr-image" src="" alt="Código QR" style="display: none;">
+                        <div class="qr-placeholder">
+                            <i class="fas fa-qrcode"></i>
+                            <p>Generando código QR...</p>
+                        </div>
+                    </div>
+
+                    <div class="qr-datos-pago">
+                        <h4><i class="fas fa-building"></i> Datos de Pago</h4>
+                        <div class="dato-pago">
+                            <span class="label">Banco:</span>
+                            <span class="valor">Banco Nacional de Bolivia</span>
+                        </div>
+                        <div class="dato-pago">
+                            <span class="label">Titular:</span>
+                            <span class="valor">Sauna C y G</span>
+                        </div>
+                        <div class="dato-pago">
+                            <span class="label">NIT:</span>
+                            <span class="valor">123456789</span>
+                        </div>
+                    </div>
+
+                    <div class="qr-instructions">
+                        <h4><i class="fas fa-info-circle"></i> Instrucciones de Pago</h4>
+                        <ol>
+                            <li><i class="fas fa-mobile-alt"></i> Abre tu aplicación de banca móvil</li>
+                            <li><i class="fas fa-qrcode"></i> Escanea el código QR mostrado arriba</li>
+                            <li><i class="fas fa-check-circle"></i> Confirma el monto y realiza el pago</li>
+                            <li><i class="fas fa-camera"></i> Guarda el comprobante de pago</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="confirmarPagoQR()" class="btn-confirm">
+                    <i class="fas fa-check-circle"></i>
+                    He Completado el Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrito Flotante -->
+    <div id="carrito-flotante" class="carrito-flotante" style="display: none;">
+        <div class="carrito-flotante-header" onclick="toggleCarritoFlotante()">
+            <div class="carrito-flotante-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <div class="carrito-flotante-badge" id="carrito-flotante-count">0</div>
+            </div>
+            <div class="carrito-flotante-info">
+                <span class="carrito-flotante-title">Mi Carrito</span>
+                <span class="carrito-flotante-total" id="carrito-flotante-total">0 Bs</span>
+            </div>
+            <div class="carrito-flotante-toggle">
+                <i class="fas fa-chevron-up" id="carrito-toggle-icon"></i>
+            </div>
+        </div>
+
+        <div class="carrito-flotante-content" id="carrito-flotante-content">
+            <div class="carrito-flotante-items" id="carrito-flotante-items">
+                <!-- Items del carrito -->
+            </div>
+            <div class="carrito-flotante-actions">
+                <button onclick="mostrarCarrito()" class="btn-ver-carrito">
+                    <i class="fas fa-eye"></i> Ver Carrito Completo
+                </button>
+                <button onclick="procederPago()" class="btn-proceder-pago">
+                    <i class="fas fa-credit-card"></i> Proceder al Pago
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación Toast -->
+    <div id="toast-notification" class="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- Botón flotante de registro (se muestra cuando no hay cliente logueado) -->
+    <!-- Se crea dinámicamente desde JavaScript -->
+
+    <!-- Modal de Registro/Login Mejorado -->
+    <div id="registro-modal" class="modal registro-modal-overlay" style="display: none;">
+        <div class="registro-modal-container">
+            <button class="registro-close-btn" onclick="cerrarRegistro()">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="registro-content">
+                <!-- Sidebar con información -->
+                <div class="registro-sidebar">
+                    <div class="registro-sidebar-header">
+                        <div class="registro-logo">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <h2>Sauna C y G</h2>
+                        <p>Tu oasis de relajación</p>
+                    </div>
+
+                    <div class="registro-beneficios-sidebar">
+                        <h3><i class="fas fa-star"></i> ¿Por qué registrarte?</h3>
+                        <div class="beneficio-item">
+                            <div class="beneficio-icon">
+                                <i class="fas fa-percent"></i>
+                            </div>
+                            <div class="beneficio-text">
+                                <h4>Descuentos Exclusivos</h4>
+                                <p>Hasta 20% en tu próxima visita</p>
+                            </div>
+                        </div>
+                        <div class="beneficio-item">
+                            <div class="beneficio-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="beneficio-text">
+                                <h4>Reservas Rápidas</h4>
+                                <p>Guarda tus preferencias</p>
+                            </div>
+                        </div>
+                        <div class="beneficio-item">
+                            <div class="beneficio-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="beneficio-text">
+                                <h4>Historial Completo</h4>
+                                <p>Accede a todas tus reservas</p>
+                            </div>
+                        </div>
+                        <div class="beneficio-item">
+                            <div class="beneficio-icon">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="beneficio-text">
+                                <h4>Ofertas Especiales</h4>
+                                <p>Promociones solo para ti</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="registro-stats">
+                        <div class="stat-box">
+                            <i class="fas fa-users"></i>
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Clientes</span>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fas fa-star"></i>
+                            <span class="stat-number">4.9</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formularios -->
+                <div class="registro-forms">
+                    <div class="registro-tabs">
+                        <button class="registro-tab-btn active" onclick="cambiarTab('login')">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Iniciar Sesión</span>
+                        </button>
+                        <button class="registro-tab-btn" onclick="cambiarTab('registro')">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Registrarse</span>
+                        </button>
+                    </div>
+
+                    <!-- Tab de Login -->
+                    <div id="login-tab" class="registro-tab-content active">
+                        <div class="form-header-registro">
+                            <div class="form-icon-registro">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h2>¡Bienvenido de Nuevo!</h2>
+                            <p>Inicia sesión para continuar tu experiencia</p>
+                        </div>
+
+                        <form id="login-form" class="registro-form" onsubmit="handleLogin(event)">
+                            <div class="form-group-registro">
+                                <label for="login-email">
+                                    <i class="fas fa-envelope"></i> Correo Electrónico
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="login-email" placeholder="tu@email.com" required>
+                                    <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label for="login-password">
+                                    <i class="fas fa-lock"></i> Contraseña
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="password" id="login-password" placeholder="••••••••" required>
+                                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                    <button type="button" class="toggle-password"
+                                        onclick="togglePassword('login-password')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-options-registro">
+                                <label class="checkbox-label-registro">
+                                    <input type="checkbox" id="recordar">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">Recordarme</span>
+                                </label>
+                                <a href="#" class="link-recuperar">¿Olvidaste tu contraseña?</a>
+                            </div>
+
+                            <button type="submit" class="btn-submit-registro">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </button>
+
+                            <div class="form-divider">
+                                <span>o continúa con</span>
+                            </div>
+
+                            <div class="social-login">
+                                <button type="button" class="btn-social google">
+                                    <i class="fab fa-google"></i> Google
+                                </button>
+                                <button type="button" class="btn-social facebook">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tab de Registro -->
+                    <div id="registro-tab" class="registro-tab-content">
+                        <div class="form-header-registro">
+                            <div class="form-icon-registro">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h2>Crear Cuenta Nueva</h2>
+                            <p>Únete a nuestra comunidad de bienestar</p>
+                        </div>
+
+                        <form id="registro-form" class="registro-form" onsubmit="handleRegistro(event)">
+                            <div class="form-row-registro">
+                                <div class="form-group-registro">
+                                    <label for="registro-nombre">
+                                        <i class="fas fa-user"></i> Nombre
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="registro-nombre" placeholder="Tu nombre" required>
+                                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-registro">
+                                    <label for="registro-apellido">
+                                        <i class="fas fa-user"></i> Apellido
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="registro-apellido" placeholder="Tu apellido" required>
+                                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label for="registro-email">
+                                    <i class="fas fa-envelope"></i> Correo Electrónico
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="registro-email" placeholder="tu@email.com" required>
+                                    <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <small class="field-help-registro">
+                                    <i class="fas fa-info-circle"></i> Te enviaremos confirmaciones aquí
+                                </small>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label for="registro-telefono">
+                                    <i class="fas fa-phone"></i> Teléfono / WhatsApp
+                                </label>
+                                <div class="input-wrapper">
+                                    <input type="tel" id="registro-telefono" placeholder="70123456" required
+                                        pattern="[0-9]{8,10}">
+                                    <span class="input-icon"><i class="fas fa-phone"></i></span>
+                                </div>
+                                <small class="field-help-registro">
+                                    <i class="fas fa-info-circle"></i> Sin espacios ni guiones
+                                </small>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label for="registro-ciudad">
+                                    <i class="fas fa-map-marker-alt"></i> Ciudad
+                                </label>
+                                <div class="input-wrapper">
+                                    <select id="registro-ciudad" required>
+                                        <option value="">Selecciona tu ciudad</option>
+                                        <option value="La Paz">La Paz</option>
+                                        <option value="Santa Cruz">Santa Cruz</option>
+                                        <option value="Cochabamba">Cochabamba</option>
+                                        <option value="Oruro">Oruro</option>
+                                        <option value="Potosí">Potosí</option>
+                                        <option value="Tarija">Tarija</option>
+                                        <option value="Sucre">Sucre</option>
+                                        <option value="Beni">Beni</option>
+                                        <option value="Pando">Pando</option>
+                                        <option value="Otra">Otra</option>
+                                    </select>
+                                    <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row-registro">
+                                <div class="form-group-registro">
+                                    <label for="registro-password">
+                                        <i class="fas fa-lock"></i> Contraseña
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="registro-password" placeholder="••••••••" required
+                                            minlength="6">
+                                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                        <button type="button" class="toggle-password"
+                                            onclick="togglePassword('registro-password')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-strength" id="password-strength">
+                                        <div class="strength-bar"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-registro">
+                                    <label for="registro-password-confirm">
+                                        <i class="fas fa-lock"></i> Confirmar
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="registro-password-confirm" placeholder="••••••••"
+                                            required>
+                                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                        <button type="button" class="toggle-password"
+                                            onclick="togglePassword('registro-password-confirm')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label class="checkbox-label-registro">
+                                    <input type="checkbox" id="terminos" required>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">
+                                        Acepto los <a href="#" class="link-terminos">términos y condiciones</a>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="form-group-registro">
+                                <label class="checkbox-label-registro">
+                                    <input type="checkbox" id="notificaciones" checked>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">
+                                        Recibir ofertas y promociones por WhatsApp
+                                    </span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-submit-registro">
+                                <i class="fas fa-user-plus"></i> Crear Mi Cuenta
+                            </button>
+
+                            <div class="form-divider">
+                                <span>o regístrate con</span>
+                            </div>
+
+                            <div class="social-login">
+                                <button type="button" class="btn-social google">
+                                    <i class="fab fa-google"></i> Google
+                                </button>
+                                <button type="button" class="btn-social facebook">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

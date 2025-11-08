@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauna C y G - Panel de Administración</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <header class="admin-header auto-hide" id="admin-header">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">
+                    <span>Sauna C y G - Gestión Completa</span>
+                    <h1>Panel de Administración</h1>
+                </div>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="#solicitudes-pendientes" class="nav-link" id="nav-solicitudes">
+                    <i class="fas fa-bell"></i>
+                    <span>Solicitudes</span>
+                    <div class="notification-badge" id="solicitudes-badge" style="display: none;">0</div>
+                </a>
+                <a href="#modulos-admin" class="nav-link">
+                    <i class="fas fa-spa"></i>
+                    <span>Módulos</span>
+                </a>
+                <a href="#productos-admin" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#reservas-admin" class="nav-link">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="#usuarios-admin" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Usuarios</span>
+                </a>
+                <a href="#ingresos" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ingresos</span>
+                </a>
+                <a href="#configuracion" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+                <a href="index.html" target="_blank" class="nav-link external">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Ver Sitio</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Gestión de Módulos -->
+            <section id="modulos-admin" class="section">
+                <h2><i class="fas fa-spa"></i> Gestión de Módulos de Sauna</h2>
+
+                <div class="admin-controls">
+                    <button onclick="actualizarEstadoModulos()" class="btn-primary">
+                        <i class="fas fa-sync"></i> Actualizar Estados
+                    </button>
+                    <button onclick="configurarMantenimiento()" class="btn-warning">
+                        <i class="fas fa-tools"></i> Programar Mantenimiento
+                    </button>
+                    <button onclick="mostrarFormularioNuevaSauna()" class="btn-success">
+                        <i class="fas fa-plus"></i> Agregar Nueva Sauna
+                    </button>
+                </div>
+
+                <div class="modulos-admin-grid" id="modulos-admin-grid">
+                    <!-- Los módulos se cargarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Modal para configurar módulo -->
+            <div id="modulo-config-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="cerrarConfiguracionModulo()">&times;</span>
+                    <h3 id="modulo-config-title">Configurar Módulo</h3>
+                    <form id="modulo-config-form">
+                        <div class="form-group">
+                            <label for="modulo-nombre">Nombre/Número de Sauna:</label>
+                            <input type="text" id="modulo-nombre" placeholder="Ej: Sauna 1, Sauna Familiar A" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modulo-tipo">Tipo de Sauna:</label>
+                            <select id="modulo-tipo" required>
+                                <option value="individual">Individual</option>
+                                <option value="doble">Doble</option>
+                                <option value="semifamiliar">Semifamiliar</option>
+                                <option value="familiar">Familiar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modulo-estado">Estado del Módulo:</label>
+                            <select id="modulo-estado" required>
+                                <option value="disponible">Disponible</option>
+                                <option value="no-disponible">No Disponible</option>
+                                <option value="reservado">Reservado</option>
+                                <option value="mantenimiento">En Mantenimiento</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="temporizador-group" style="display: none;">
+                            <label for="tiempo-mantenimiento">Tiempo de Mantenimiento (minutos):</label>
+                            <input type="number" id="tiempo-mantenimiento" min="15" max="480" step="15">
+                            <small>Mínimo 15 minutos, máximo 8 horas</small>
+                        </div>
+                        <div class="form-group" id="reserva-group" style="display: none;">
+                            <label for="hora-disponible">Hora que estará disponible:</label>
+                            <input type="datetime-local" id="hora-disponible">
+                            <small>Selecciona cuándo estará disponible el sauna</small>
+                        </div>
+                        <div class="form-group" id="motivo-group" style="display: none;">
+                            <label for="motivo-estado">Motivo/Observaciones:</label>
+                            <textarea id="motivo-estado"
+                                placeholder="Describe el motivo o agrega observaciones"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar Configuración</button>
+                            <button type="button" onclick="cerrarConfiguracionModulo()"
+                                class="btn-secondary">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Solicitudes Pendientes -->
+            <section id="solicitudes-pendientes" class="section">
+                <h2><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h2>
+
+                <div class="solicitudes-container" id="solicitudes-container">
+                    <!-- Las solicitudes se cargarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Gestión de Productos -->
+            <section id="productos-admin" class="section">
+                <h2><i class="fas fa-box"></i> Gestión de Inventario</h2>
+
+                <div class="admin-controls">
+                    <button onclick="mostrarFormularioProducto()" class="btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Nuevo Producto
+                    </button>
+                    <button onclick="exportarInventario()" class="btn-secondary">
+                        <i class="fas fa-download"></i> Exportar Inventario
+                    </button>
+                </div>
+
+                <div class="productos-admin-grid" id="productos-admin-grid">
+                    <!-- Los productos se cargarán dinámicamente -->
+                </div>
+
+                <!-- Formulario para agregar/editar productos -->
+                <div id="producto-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="cerrarFormularioProducto()">&times;</span>
+                        <h3 id="producto-modal-title">Agregar Producto</h3>
+                        <form id="producto-form">
+                            <div class="form-group">
+                                <label for="producto-nombre">Nombre del Producto:</label>
+                                <input type="text" id="producto-nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="producto-categoria">Categoría:</label>
+                                <select id="producto-categoria" required>
+                                    <option value="dulces">Dulces</option>
+                                    <option value="shampus">Champús</option>
+                                    <option value="refrescos">Refrescos</option>
+                                    <option value="implementos">Implementos</option>
+                                    <option value="otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="producto-precio">Precio (Bs):</label>
+                                <input type="number" id="producto-precio" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="producto-stock">Stock Disponible:</label>
+                                <input type="number" id="producto-stock" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="producto-imagen">Imagen del Producto:</label>
+
+                                <!-- Tabs para elegir método -->
+                                <div class="imagen-tabs">
+                                    <button type="button" class="imagen-tab-btn active"
+                                        onclick="cambiarMetodoImagen('archivo')">
+                                        <i class="fas fa-upload"></i> Subir Archivo
+                                    </button>
+                                    <button type="button" class="imagen-tab-btn" onclick="cambiarMetodoImagen('url')">
+                                        <i class="fas fa-link"></i> Desde URL
+                                    </button>
+                                    <button type="button" class="imagen-tab-btn"
+                                        onclick="cambiarMetodoImagen('buscar')">
+                                        <i class="fas fa-search"></i> Buscar en Internet
+                                    </button>
+                                </div>
+
+                                <!-- Método: Subir archivo -->
+                                <div id="metodo-archivo" class="metodo-imagen active">
+                                    <input type="file" id="producto-imagen" accept="image/*">
+                                    <small class="field-help">Formatos: JPG, PNG, GIF (máx. 5MB)</small>
+                                </div>
+
+                                <!-- Método: URL -->
+                                <div id="metodo-url" class="metodo-imagen">
+                                    <input type="url" id="producto-imagen-url"
+                                        placeholder="https://ejemplo.com/imagen.jpg">
+                                    <button type="button" class="btn-cargar-url" onclick="cargarImagenDesdeURL()">
+                                        <i class="fas fa-download"></i> Cargar Imagen
+                                    </button>
+                                    <small class="field-help">Pega la URL de una imagen de internet</small>
+                                </div>
+
+                                <!-- Método: Buscar -->
+                                <div id="metodo-buscar" class="metodo-imagen">
+                                    <div class="buscador-imagenes">
+                                        <input type="text" id="buscar-imagen-query"
+                                            placeholder="Buscar imagen... (ej: sauna, toalla, champú)">
+                                        <button type="button" class="btn-buscar-imagen" onclick="buscarImagenes()">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                    <div id="resultados-busqueda" class="resultados-busqueda">
+                                        <!-- Los resultados aparecerán aquí -->
+                                    </div>
+                                    <small class="field-help">Busca imágenes gratuitas de Unsplash</small>
+                                </div>
+
+                                <!-- Vista previa -->
+                                <div id="imagen-preview" class="imagen-preview" style="display: none;">
+                                    <img id="preview-img" src="" alt="Vista previa">
+                                    <button type="button" class="btn-remove-image" onclick="removerImagenPreview()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">Guardar</button>
+                                <button type="button" onclick="cerrarFormularioProducto()"
+                                    class="btn-secondary">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gestión de Reservas -->
+            <section id="reservas-admin" class="section">
+                <h2><i class="fas fa-calendar-check"></i> Historial de Reservas</h2>
+
+                <!-- Filtros de Reservas -->
+                <div class="filtros-reservas">
+                    <div class="filtro-grupo">
+                        <label><i class="fas fa-calendar"></i> Desde:</label>
+                        <input type="date" id="reservas-fecha-desde" onchange="filtrarReservasAdmin()">
+                    </div>
+                    <div class="filtro-grupo">
+                        <label><i class="fas fa-calendar"></i> Hasta:</label>
+                        <input type="date" id="reservas-fecha-hasta" onchange="filtrarReservasAdmin()">
+                    </div>
+                    <div class="filtro-grupo">
+                        <label><i class="fas fa-filter"></i> Estado:</label>
+                        <select id="reservas-estado-filtro" onchange="filtrarReservasAdmin()">
+                            <option value="todos">Todos</option>
+                            <option value="pendiente">Pendientes QR</option>
+                            <option value="confirmado">Confirmados</option>
+                        </select>
+                    </div>
+                    <div class="filtro-grupo">
+                        <label><i class="fas fa-hot-tub"></i> Módulo:</label>
+                        <select id="reservas-modulo-filtro" onchange="filtrarReservasAdmin()">
+                            <option value="todos">Todos</option>
+                            <option value="individual">Individual</option>
+                            <option value="doble">Doble</option>
+                            <option value="semifamiliar">Semifamiliar</option>
+                            <option value="familiar">Familiar</option>
+                        </select>
+                    </div>
+                    <button onclick="limpiarFiltrosReservas()" class="btn-secondary">
+                        <i class="fas fa-redo"></i> Limpiar
+                    </button>
+                    <button onclick="exportarReservasActuales()" class="btn-success">
+                        <i class="fas fa-file-excel"></i> Exportar
+                    </button>
+                </div>
+
+                <!-- Estadísticas de Reservas -->
+                <div class="reservas-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-reservas-mostradas">0</span>
+                            <span class="stat-label">Total Reservas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-personas-mostradas">0</span>
+                            <span class="stat-label">Total Personas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-ingresos-reservas">0 Bs</span>
+                            <span class="stat-label">Ingresos Totales</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reservas-admin-grid" id="reservas-admin-grid">
+                    <!-- Las reservas se cargarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Ingresos -->
+            <section id="ingresos" class="section">
+                <h2><i class="fas fa-chart-line"></i> Panel de Ingresos</h2>
+
+                <div class="ingresos-summary">
+                    <div class="ingreso-card">
+                        <h3><i class="fas fa-money-bill-wave"></i> Ingresos del Día</h3>
+                        <p class="ingreso-amount" id="ingresos-dia">0 Bs</p>
+                        <small>Total recaudado hoy</small>
+                    </div>
+                    <div class="ingreso-card">
+                        <h3><i class="fas fa-spa"></i> Reservas Completadas</h3>
+                        <p class="ingreso-count" id="reservas-completadas">0</p>
+                        <small>Módulos reservados</small>
+                    </div>
+                    <div class="ingreso-card">
+                        <h3><i class="fas fa-shopping-bag"></i> Productos Vendidos</h3>
+                        <p class="ingreso-count" id="productos-vendidos">0</p>
+                        <small>Unidades vendidas</small>
+                    </div>
+                </div>
+
+                <div class="ingresos-detalle">
+                    <h3><i class="fas fa-list"></i> Historial de Transacciones</h3>
+                    <div class="filtros">
+                        <input type="date" id="fecha-filtro" onchange="filtrarTransacciones()"
+                            placeholder="Filtrar por fecha">
+                        <select id="tipo-filtro" onchange="filtrarTransacciones()">
+                            <option value="todos">Todas las transacciones</option>
+                            <option value="reservas">Solo Reservas</option>
+                            <option value="productos">Solo Productos</option>
+                        </select>
+                        <button onclick="limpiarFiltros()" class="btn-secondary">
+                            <i class="fas fa-eraser"></i> Limpiar Filtros
+                        </button>
+                    </div>
+                    <div class="transacciones-lista" id="transacciones-lista">
+                        <!-- Las transacciones se cargarán dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Gestión de Caja -->
+                <div class="gestion-caja">
+                    <h3><i class="fas fa-cash-register"></i> Historial de Movimientos de Caja</h3>
+
+                    <!-- Acciones de Caja -->
+                    <div class="caja-actions">
+                        <button onclick="mostrarModalSaldoInicial()" class="btn-primary">
+                            <i class="fas fa-wallet"></i> Saldo Inicial
+                        </button>
+                        <button onclick="mostrarModalIngreso()" class="btn-success">
+                            <i class="fas fa-plus-circle"></i> Registrar Ingreso
+                        </button>
+                        <button onclick="mostrarModalRetiro()" class="btn-warning">
+                            <i class="fas fa-minus-circle"></i> Registrar Retiro
+                        </button>
+                    </div>
+
+                    <!-- Filtros de Caja -->
+                    <div class="filtros-caja">
+                        <div class="filtro-grupo">
+                            <label><i class="fas fa-calendar"></i> Desde:</label>
+                            <input type="date" id="caja-fecha-desde" onchange="filtrarCajaAdmin()">
+                        </div>
+                        <div class="filtro-grupo">
+                            <label><i class="fas fa-calendar"></i> Hasta:</label>
+                            <input type="date" id="caja-fecha-hasta" onchange="filtrarCajaAdmin()">
+                        </div>
+                        <div class="filtro-grupo">
+                            <label><i class="fas fa-filter"></i> Tipo:</label>
+                            <select id="caja-tipo-filtro" onchange="filtrarCajaAdmin()">
+                                <option value="todos">Todos</option>
+                                <option value="ingreso">Solo Ingresos</option>
+                                <option value="retiro">Solo Retiros</option>
+                            </select>
+                        </div>
+                        <button onclick="limpiarFiltrosCaja()" class="btn-secondary">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </button>
+                        <button onclick="exportarCajaActual()" class="btn-success">
+                            <i class="fas fa-file-excel"></i> Exportar
+                        </button>
+                    </div>
+
+                    <!-- Resumen de Caja -->
+                    <div class="caja-resumen">
+                        <div class="resumen-card efectivo">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Efectivo</span>
+                                <span class="resumen-amount" id="caja-efectivo">0 Bs</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card qr">
+                            <i class="fas fa-qrcode"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Pagos QR</span>
+                                <span class="resumen-amount" id="caja-qr">0 Bs</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card ingreso">
+                            <i class="fas fa-arrow-up"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Total Ingresos</span>
+                                <span class="resumen-amount" id="caja-total-ingresos">0 Bs</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card retiro">
+                            <i class="fas fa-arrow-down"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Total Retiros</span>
+                                <span class="resumen-amount" id="caja-total-retiros">0 Bs</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card saldo">
+                            <i class="fas fa-wallet"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Saldo Total</span>
+                                <span class="resumen-amount" id="caja-saldo-actual">0 Bs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Movimientos -->
+                    <div class="caja-movimientos-lista" id="caja-movimientos-lista">
+                        <!-- Los movimientos se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gestión de Usuarios Registrados -->
+            <section id="usuarios-admin" class="section">
+                <h2><i class="fas fa-users"></i> Usuarios Registrados</h2>
+
+                <div class="usuarios-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-user-plus"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-usuarios">0</span>
+                            <span class="stat-label">Total Usuarios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-day"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="usuarios-hoy">0</span>
+                            <span class="stat-label">Registros Hoy</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-week"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="usuarios-semana">0</span>
+                            <span class="stat-label">Esta Semana</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="usuarios-activos">0</span>
+                            <span class="stat-label">Usuarios Activos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="usuarios-filtros">
+                    <input type="text" id="buscar-usuario" placeholder="Buscar por nombre, email o teléfono..."
+                        onkeyup="filtrarUsuarios()">
+                    <select id="filtro-ciudad" onchange="filtrarUsuarios()">
+                        <option value="">Todas las ciudades</option>
+                        <option value="La Paz">La Paz</option>
+                        <option value="Santa Cruz">Santa Cruz</option>
+                        <option value="Cochabamba">Cochabamba</option>
+                        <option value="Oruro">Oruro</option>
+                        <option value="Potosí">Potosí</option>
+                        <option value="Tarija">Tarija</option>
+                        <option value="Sucre">Sucre</option>
+                        <option value="Beni">Beni</option>
+                        <option value="Pando">Pando</option>
+                        <option value="Otra">Otra</option>
+                    </select>
+                    <button onclick="exportarUsuarios()" class="btn-primary">
+                        <i class="fas fa-download"></i> Exportar Lista
+                    </button>
+                </div>
+
+                <div class="usuarios-tabla-container">
+                    <table class="usuarios-tabla" id="usuarios-tabla">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Ciudad</th>
+                                <th>Fecha Registro</th>
+                                <th><i class="fas fa-circle"></i> Estado</th>
+                                <th><i class="fas fa-chart-line"></i> Stats</th>
+                                <th>Reservas</th>
+                                <th>Notificaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuarios-tbody">
+                            <!-- Los usuarios se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Configuración del Sistema -->
+            <section id="configuracion" class="section">
+                <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+
+                <div class="config-grid">
+                    <div class="config-card">
+                        <h3><i class="fas fa-database"></i> Gestión de Datos</h3>
+                        <p>Administra los datos del sistema y el historial</p>
+                        <div class="config-actions">
+                            <button onclick="limpiarHistorialReservas()" class="btn-danger">
+                                <i class="fas fa-trash"></i> Limpiar Historial de Reservas
+                            </button>
+                            <button onclick="limpiarHistorialCaja()" class="btn-danger">
+                                <i class="fas fa-trash"></i> Limpiar Historial de Caja
+                            </button>
+                            <button onclick="resetearSistema()" class="btn-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Resetear Sistema Completo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h3><i class="fas fa-download"></i> Exportar Datos</h3>
+                        <p>Descarga reportes y respaldos de información</p>
+                        <div class="config-actions">
+                            <button onclick="exportarReservas()" class="btn-primary">
+                                <i class="fas fa-file-excel"></i> Exportar Reservas
+                            </button>
+                            <button onclick="exportarIngresos()" class="btn-primary">
+                                <i class="fas fa-file-excel"></i> Exportar Ingresos
+                            </button>
+                            <button onclick="exportarInventario()" class="btn-primary">
+                                <i class="fas fa-file-excel"></i> Exportar Inventario
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h3><i class="fas fa-lock"></i> Control de Página</h3>
+                        <p>Bloquea o desbloquea el acceso a la página principal</p>
+                        <div class="config-actions">
+                            <button id="btn-toggle-pagina" onclick="toggleEstadoPagina()" class="btn-warning">
+                                <i class="fas fa-lock"></i> <span id="texto-estado-pagina">Bloquear Página</span>
+                            </button>
+                            <button onclick="configurarMensajeBloqueo()" class="btn-secondary">
+                                <i class="fas fa-edit"></i> Configurar Mensaje
+                            </button>
+                        </div>
+                        <div id="estado-actual-pagina" class="estado-pagina">
+                            <i class="fas fa-unlock"></i> Página Activa
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h3><i class="fas fa-palette"></i> Personalización de Colores</h3>
+                        <p>Cambia los colores de la página principal</p>
+                        <div class="config-actions">
+                            <button onclick="abrirEditorColores()" class="btn-primary">
+                                <i class="fas fa-paint-brush"></i> Editar Colores
+                            </button>
+                            <button onclick="restaurarColoresDefecto()" class="btn-secondary">
+                                <i class="fas fa-undo"></i> Restaurar Colores por Defecto
+                            </button>
+                        </div>
+                        <div class="color-preview" id="color-preview">
+                            <div class="preview-item">
+                                <span>Color Primario:</span>
+                                <div class="color-box" id="preview-primary"></div>
+                            </div>
+                            <div class="preview-item">
+                                <span>Color Secundario:</span>
+                                <div class="color-box" id="preview-secondary"></div>
+                            </div>
+                            <div class="preview-item">
+                                <span>Color de Acento:</span>
+                                <div class="color-box" id="preview-accent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal para Saldo Inicial -->
+    <div id="saldo-inicial-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalSaldoInicial()">&times;</span>
+            <h3><i class="fas fa-wallet"></i> Registrar Saldo Inicial de Caja</h3>
+            <p style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                Registra el dinero inicial con el que comienzas la jornada
+            </p>
+            <form id="saldo-inicial-form">
+                <div class="form-group">
+                    <label for="monto-saldo-inicial">Monto Inicial en Efectivo (Bs):</label>
+                    <input type="number" id="monto-saldo-inicial" step="0.01" min="0" required placeholder="Ej: 100">
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-saldo-inicial">Descripción (opcional):</label>
+                    <textarea id="descripcion-saldo-inicial"
+                        placeholder="Ej: Saldo inicial del día, cambio para ventas, etc."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-check"></i> Registrar Saldo Inicial
+                    </button>
+                    <button type="button" onclick="cerrarModalSaldoInicial()" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Ingreso en Efectivo -->
+    <div id="ingreso-modal" class="modal"></div>
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModalIngreso()">&times;</span>
+        <h3>Registrar Ingreso en Efectivo</h3>
+        <form id="ingreso-form">
+            <div class="form-group">
+                <label for="monto-ingreso">Monto en Efectivo (Bs):</label>
+                <input type="number" id="monto-ingreso" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="concepto-ingreso">Concepto del Ingreso:</label>
+                <select id="concepto-ingreso" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="venta-directa">Venta Directa</option>
+                    <option value="pago-reserva">Pago de Reserva</option>
+                    <option value="productos">Venta de Productos</option>
+                    <option value="otros">Otros Ingresos</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descripcion-ingreso">Descripción (opcional):</label>
+                <textarea id="descripcion-ingreso" placeholder="Detalles adicionales del ingreso"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-success">Registrar Ingreso</button>
+                <button type="button" onclick="cerrarModalIngreso()" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </div>
+    </div>
+
+    <!-- Modal para Retiro de Dinero -->
+    <div id="retiro-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalRetiro()">&times;</span>
+            <h3>Registrar Retiro de Dinero</h3>
+            <form id="retiro-form">
+                <div class="form-group">
+                    <label for="monto-retiro">Monto a Retirar (Bs):</label>
+                    <input type="number" id="monto-retiro" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="motivo-retiro">Motivo del Retiro:</label>
+                    <select id="motivo-retiro" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="gastos-operativos">Gastos Operativos</option>
+                        <option value="compra-insumos">Compra de Insumos</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="servicios">Pago de Servicios</option>
+                        <option value="personal">Gastos de Personal</option>
+                        <option value="otros">Otros Gastos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-retiro">Descripción del Gasto:</label>
+                    <textarea id="descripcion-retiro" placeholder="Describe para qué es este retiro"
+                        required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-warning">Registrar Retiro</button>
+                    <button type="button" onclick="cerrarModalRetiro()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Historial de Caja -->
+    <div id="historial-caja-modal" class="modal">
+        <div class="modal-content large-modal">
+            <span class="close" onclick="cerrarHistorialCaja()">&times;</span>
+            <h3>Historial de Movimientos de Caja</h3>
+            <div class="historial-filtros">
+                <input type="date" id="fecha-caja-filtro">
+                <select id="tipo-movimiento-filtro">
+                    <option value="todos">Todos los Movimientos</option>
+                    <option value="ingreso">Solo Ingresos</option>
+                    <option value="retiro">Solo Retiros</option>
+                </select>
+                <button onclick="filtrarHistorialCaja()" class="btn-primary">Filtrar</button>
+            </div>
+            <div class="historial-caja-content" id="historial-caja-content">
+                <!-- El historial se cargará dinámicamente -->
+            </div>
+            <div class="historial-resumen">
+                <div class="resumen-item">
+                    <span>Total Ingresos:</span>
+                    <span id="total-ingresos-caja" class="amount positive">0 Bs</span>
+                </div>
+                <div class="resumen-item">
+                    <span>Total Retiros:</span>
+                    <span id="total-retiros-caja" class="amount negative">0 Bs</span>
+                </div>
+                <div class="resumen-item total">
+                    <span>Saldo en Caja:</span>
+                    <span id="saldo-caja" class="amount">0 Bs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Historial de Reservas -->
+    <div id="historial-reservas-modal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-alt"></i> Historial Completo de Reservas</h3>
+                <span class="close" onclick="cerrarHistorialReservas()">&times;</span>
+            </div>
+            <div class="historial-filtros">
+                <input type="date" id="fecha-reservas-desde" placeholder="Desde">
+                <input type="date" id="fecha-reservas-hasta" placeholder="Hasta">
+                <select id="modulo-filtro">
+                    <option value="todos">Todos los Módulos</option>
+                    <option value="1">Módulo 1</option>
+                    <option value="2">Módulo 2</option>
+                    <option value="3">Módulo 3</option>
+                    <option value="4">Módulo 4</option>
+                    <option value="5">Módulo 5</option>
+                </select>
+                <button onclick="filtrarHistorialReservas()" class="btn-primary">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <button onclick="exportarHistorialReservas()" class="btn-success">
+                    <i class="fas fa-file-excel"></i> Exportar
+                </button>
+            </div>
+            <div class="historial-reservas-content" id="historial-reservas-content">
+                <!-- El historial se cargará dinámicamente -->
+            </div>
+            <div class="historial-resumen">
+                <div class="resumen-item">
+                    <span>Total Reservas:</span>
+                    <span id="total-reservas-historial" class="amount">0</span>
+                </div>
+                <div class="resumen-item">
+                    <span>Total Personas:</span>
+                    <span id="total-personas-historial" class="amount">0</span>
+                </div>
+                <div class="resumen-item total">
+                    <span>Ingresos Totales:</span>
+                    <span id="ingresos-reservas-historial" class="amount positive">0 Bs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Flotante para Solicitudes Pendientes -->
+    <div id="solicitudes-modal" class="modal solicitudes-modal"></div>
+    <div class="modal-content solicitudes-modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h3>
+            <span class="close" onclick="cerrarSolicitudesModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="solicitudes-stats">
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="total-solicitudes">0</span>
+                        <span class="stat-label">Total Pendientes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="monto-total-solicitudes">0 Bs</span>
+                        <span class="stat-label">Monto Total</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="solicitudes-filtros">
+                <input type="text" id="buscar-solicitud" placeholder="Buscar por cliente o ID..."
+                    onkeyup="filtrarSolicitudes()">
+                <select id="filtro-estado-solicitud" onchange="filtrarSolicitudes()">
+                    <option value="todas">Todas las solicitudes</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="procesando">En proceso</option>
+                </select>
+                <button onclick="actualizarSolicitudes()" class="btn-primary btn-small">
+                    <i class="fas fa-sync"></i> Actualizar
+                </button>
+            </div>
+
+            <div class="solicitudes-lista" id="solicitudes-lista">
+                <!-- Las solicitudes se cargarán aquí -->
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal de Editor de Colores -->
+    <div id="modal-editor-colores" class="modal" style="display: none;">
+        <div class="modal-content modal-colores">
+            <span class="close" onclick="cerrarEditorColores()">&times;</span>
+            <h3><i class="fas fa-palette"></i> Editor de Colores de la Página Principal</h3>
+
+            <div class="editor-colores-container">
+                <div class="color-section">
+                    <h4>Colores Principales</h4>
+
+                    <div class="color-input-group">
+                        <label for="color-primary">
+                            <i class="fas fa-circle" style="color: var(--primary-color);"></i>
+                            Color Primario
+                        </label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="color-primary" class="color-picker">
+                            <input type="text" id="color-primary-hex" class="color-hex" placeholder="#2c3e50">
+                        </div>
+                        <small>Color principal de la página (header, botones)</small>
+                    </div>
+
+                    <div class="color-input-group">
+                        <label for="color-secondary">
+                            <i class="fas fa-circle" style="color: var(--secondary-color);"></i>
+                            Color Secundario
+                        </label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="color-secondary" class="color-picker">
+                            <input type="text" id="color-secondary-hex" class="color-hex" placeholder="#34495e">
+                        </div>
+                        <small>Color secundario (fondos, degradados)</small>
+                    </div>
+
+                    <div class="color-input-group">
+                        <label for="color-accent">
+                            <i class="fas fa-circle" style="color: var(--accent-color);"></i>
+                            Color de Acento
+                        </label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="color-accent" class="color-picker">
+                            <input type="text" id="color-accent-hex" class="color-hex" placeholder="#3498db">
+                        </div>
+                        <small>Color de acento (enlaces, destacados)</small>
+                    </div>
+
+                    <div class="color-input-group">
+                        <label for="color-success">
+                            <i class="fas fa-circle" style="color: #2ecc71;"></i>
+                            Color de Éxito
+                        </label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="color-success" class="color-picker">
+                            <input type="text" id="color-success-hex" class="color-hex" placeholder="#2ecc71">
+                        </div>
+                        <small>Color para mensajes de éxito</small>
+                    </div>
+                </div>
+
+                <div class="color-preview-live">
+                    <h4>Vista Previa</h4>
+                    <div class="preview-demo">
+                        <div class="demo-header" id="demo-header">
+                            <h3>Sauna C y G</h3>
+                            <button class="demo-button" id="demo-button">Botón de Ejemplo</button>
+                        </div>
+                        <div class="demo-content">
+                            <p>Este es un ejemplo de cómo se verá la página con los colores seleccionados.</p>
+                            <a href="#" class="demo-link" id="demo-link">Enlace de ejemplo</a>
+                        </div>
+                        <div class="demo-success" id="demo-success">
+                            <i class="fas fa-check-circle"></i> Mensaje de éxito
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-presets">
+                <h4>Temas Predefinidos</h4>
+                <div class="presets-grid">
+                    <button class="preset-btn" onclick="aplicarPreset('default')">
+                        <div class="preset-colors">
+                            <span style="background: #2c3e50;"></span>
+                            <span style="background: #34495e;"></span>
+                            <span style="background: #3498db;"></span>
+                        </div>
+                        <span>Por Defecto</span>
+                    </button>
+                    <button class="preset-btn" onclick="aplicarPreset('ocean')">
+                        <div class="preset-colors">
+                            <span style="background: #006994;"></span>
+                            <span style="background: #0088b8;"></span>
+                            <span style="background: #00a8e8;"></span>
+                        </div>
+                        <span>Océano</span>
+                    </button>
+                    <button class="preset-btn" onclick="aplicarPreset('forest')">
+                        <div class="preset-colors">
+                            <span style="background: #2d5016;"></span>
+                            <span style="background: #3d6b1f;"></span>
+                            <span style="background: #4d8629;"></span>
+                        </div>
+                        <span>Bosque</span>
+                    </button>
+                    <button class="preset-btn" onclick="aplicarPreset('sunset')">
+                        <div class="preset-colors">
+                            <span style="background: #d35400;"></span>
+                            <span style="background: #e67e22;"></span>
+                            <span style="background: #f39c12;"></span>
+                        </div>
+                        <span>Atardecer</span>
+                    </button>
+                    <button class="preset-btn" onclick="aplicarPreset('purple')">
+                        <div class="preset-colors">
+                            <span style="background: #6c3483;"></span>
+                            <span style="background: #8e44ad;"></span>
+                            <span style="background: #9b59b6;"></span>
+                        </div>
+                        <span>Púrpura</span>
+                    </button>
+                    <button class="preset-btn" onclick="aplicarPreset('elegant')">
+                        <div class="preset-colors">
+                            <span style="background: #1a1a1a;"></span>
+                            <span style="background: #2d2d2d;"></span>
+                            <span style="background: #c0392b;"></span>
+                        </div>
+                        <span>Elegante</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="guardarColores()" class="btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <button onclick="cerrarEditorColores()" class="btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles de Solicitud -->
+    <div id="modal-detalles-solicitud" class="modal">
+        <div class="modal-content modal-detalles-solicitud">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Detalles de la Solicitud</h2>
+                <span class="close" onclick="cerrarModalDetalles()">&times;</span>
+            </div>
+            <div class="modal-body" id="contenido-detalles-solicitud">
+                <!-- Los detalles se cargarán dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button onclick="imprimirSolicitud()" class="btn-imprimir">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+                <button onclick="cerrarModalDetalles()" class="btn-cancelar">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+
+</html>
+
+
+<!-- Modal de Selección de Período para Exportar -->
+<div id="modal-periodo-exportar" class="modal" style="display: none;">
+    <div class="modal-content modal-periodo">
+        <span class="close" onclick="cerrarModalPeriodo()">&times;</span>
+        <h3><i class="fas fa-calendar-alt"></i> Seleccionar Período de Exportación</h3>
+
+        <p class="modal-descripcion">Selecciona el período de tiempo que deseas exportar:</p>
+
+        <div class="periodo-opciones">
+            <button class="periodo-btn" onclick="confirmarExportacion('1dia')">
+                <i class="fas fa-calendar-day"></i>
+                <span>1 Día</span>
+                <small>Últimas 24 horas</small>
+            </button>
+
+            <button class="periodo-btn" onclick="confirmarExportacion('1semana')">
+                <i class="fas fa-calendar-week"></i>
+                <span>1 Semana</span>
+                <small>Últimos 7 días</small>
+            </button>
+
+            <button class="periodo-btn" onclick="confirmarExportacion('1mes')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>1 Mes</span>
+                <small>Últimos 30 días</small>
+            </button>
+
+            <button class="periodo-btn" onclick="confirmarExportacion('1ano')">
+                <i class="fas fa-calendar"></i>
+                <span>1 Año</span>
+                <small>Últimos 365 días</small>
+            </button>
+
+            <button class="periodo-btn periodo-todo" onclick="confirmarExportacion('todo')">
+                <i class="fas fa-infinity"></i>
+                <span>Todo</span>
+                <small>Todos los registros</small>
+            </button>
+        </div>
+
+        <div class="modal-actions-periodo">
+            <button onclick="cerrarModalPeriodo()" class="btn-cancelar-periodo">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+</div>
