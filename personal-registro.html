@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Personal - Sauna C y G</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .registro-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 3rem;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .registro-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .registro-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .registro-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .registro-header h1 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .registro-header p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+            margin-left: 0.25rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn-registro {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .btn-registro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-registro:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .registro-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .registro-footer p {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .registro-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .registro-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        .success-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .success-message h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .registro-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .registro-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="registro-container">
+        <div class="registro-header">
+            <div class="registro-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1>Registro de Personal</h1>
+            <p>Sauna C y G - El Jordán</p>
+        </div>
+
+        <div id="success-message" class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <h3>¡Registro Completado!</h3>
+            <p>Tu cuenta ha sido creada exitosamente.</p>
+            <p>Ya puedes acceder al panel con tu código.</p>
+            <a href="personal-login.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 2rem; background: #667eea; color: white; text-decoration: none; border-radius: 8px;">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
+        </div>
+
+        <form id="registro-form" style="display: block;">
+            <div class="form-group">
+                <label for="codigo-acceso">
+                    Código de Acceso
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="codigo-acceso" required placeholder="XXXX-XXXX" maxlength="9" style="font-family: 'Courier New', monospace; font-weight: 600; letter-spacing: 2px; text-align: center;">
+                </div>
+                <small style="color: #7f8c8d; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+                    Ingresa el código que te proporcionó el administrador
+                </small>
+                <div class="error-message" id="error-codigo">Este campo es obligatorio</div>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre-completo">
+                    Nombre Completo
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="nombre-completo" required placeholder="Ej: Juan Pérez García">
+                </div>
+                <div class="error-message" id="error-nombre">Este campo es obligatorio</div>
+            </div>
+
+            <div class="form-group">
+                <label for="ci">
+                    Cédula de Identidad (C.I.)
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="ci" required placeholder="Ej: 1234567 LP">
+                </div>
+                <div class="error-message" id="error-ci">Este campo es obligatorio</div>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">
+                    Correo Electrónico
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="correo" required placeholder="ejemplo@correo.com">
+                </div>
+                <div class="error-message" id="error-correo">Ingresa un correo válido</div>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">
+                    Teléfono
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="telefono" required placeholder="Ej: 71234567">
+                </div>
+                <div class="error-message" id="error-telefono">Este campo es obligatorio</div>
+            </div>
+
+            <button type="submit" class="btn-registro" id="btn-enviar">
+                <i class="fas fa-check-circle"></i>
+                Completar Registro
+            </button>
+        </form>
+
+        <div class="registro-footer">
+            <p>¿Ya tienes un código de acceso?</p>
+            <a href="personal-login.html">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
+            <br><br>
+            <a href="index.html">
+                <i class="fas fa-home"></i> Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Formatear código mientras se escribe
+        document.getElementById('codigo-acceso').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8);
+            }
+
+            e.target.value = value;
+        });
+
+        document.getElementById('registro-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Obtener valores
+            const codigo = document.getElementById('codigo-acceso').value.trim().toUpperCase();
+            const nombre = document.getElementById('nombre-completo').value.trim();
+            const ci = document.getElementById('ci').value.trim();
+            const correo = document.getElementById('correo').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+
+            // Validar campos
+            let valido = true;
+
+            // Validar código
+            if (!codigo) {
+                document.getElementById('error-codigo').textContent = 'Este campo es obligatorio';
+                document.getElementById('error-codigo').classList.add('show');
+                document.getElementById('codigo-acceso').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('error-codigo').classList.remove('show');
+                document.getElementById('codigo-acceso').classList.remove('error');
+            }
+
+            if (!nombre) {
+                document.getElementById('error-nombre').classList.add('show');
+                document.getElementById('nombre-completo').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('error-nombre').classList.remove('show');
+                document.getElementById('nombre-completo').classList.remove('error');
+            }
+
+            if (!ci) {
+                document.getElementById('error-ci').classList.add('show');
+                document.getElementById('ci').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('error-ci').classList.remove('show');
+                document.getElementById('ci').classList.remove('error');
+            }
+
+            if (!correo || !correo.includes('@')) {
+                document.getElementById('error-correo').classList.add('show');
+                document.getElementById('correo').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('error-correo').classList.remove('show');
+                document.getElementById('correo').classList.remove('error');
+            }
+
+            if (!telefono) {
+                document.getElementById('error-telefono').classList.add('show');
+                document.getElementById('telefono').classList.add('error');
+                valido = false;
+            } else {
+                document.getElementById('error-telefono').classList.remove('show');
+                document.getElementById('telefono').classList.remove('error');
+            }
+
+            if (!valido) return;
+
+            // Verificar si el código existe y está disponible
+            const codigosDisponibles = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            console.log('Códigos disponibles:', codigosDisponibles);
+            console.log('Código ingresado:', codigo);
+            
+            const codigoValido = codigosDisponibles.find(c => c.codigo === codigo && !c.usado);
+            console.log('Código válido encontrado:', codigoValido);
+
+            if (!codigoValido) {
+                document.getElementById('error-codigo').textContent = 'Código inválido o ya utilizado';
+                document.getElementById('error-codigo').classList.add('show');
+                document.getElementById('codigo-acceso').classList.add('error');
+                return;
+            }
+
+            // Marcar código como usado
+            const indexCodigo = codigosDisponibles.findIndex(c => c.codigo === codigo);
+            codigosDisponibles[indexCodigo].usado = true;
+            codigosDisponibles[indexCodigo].fechaUso = new Date().toISOString();
+            localStorage.setItem('codigosAccesoDisponibles', JSON.stringify(codigosDisponibles));
+
+            // Crear personal directamente (ya aprobado)
+            const nuevoPersonal = {
+                id: Date.now().toString(),
+                nombre: nombre,
+                ci: ci,
+                email: correo,
+                telefono: telefono,
+                codigo: codigo,
+                activo: true,
+                bloqueado: false,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            // Guardar en personal registrado
+            const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            personalRegistrado.push(nuevoPersonal);
+            localStorage.setItem('personalRegistrado', JSON.stringify(personalRegistrado));
+
+            // Mostrar mensaje de éxito
+            document.getElementById('registro-form').style.display = 'none';
+            document.getElementById('success-message').classList.add('show');
+        });
+    </script>
+</body>
+
+</html>

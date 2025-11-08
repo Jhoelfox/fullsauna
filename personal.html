@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sauna C y G - Personal Administrativo</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="personal-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <header class="admin-header" id="admin-header">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="logo-text">
+                    <span>Sauna C y G - El Jordán</span>
+                    <h1>Panel de Personal Administrativo</h1>
+                </div>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="#modulos-personal" class="nav-link">
+                    <i class="fas fa-spa"></i>
+                    <span>Estados Sauna</span>
+                </a>
+                <a href="#ventas-rapidas" class="nav-link">
+                    <i class="fas fa-cash-register"></i>
+                    <span>Ventas Rápidas</span>
+                </a>
+                <a href="#productos-personal" class="nav-link">
+                    <i class="fas fa-box"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="index.html" target="_blank" class="nav-link external">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Ver Sitio</span>
+                </a>
+                <a href="#" onclick="cerrarSesionPersonal(event)" class="nav-link" style="background: #e74c3c;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Gestión de Estados de Módulos -->
+            <section id="modulos-personal" class="section">
+                <div class="section-header-collapsible" onclick="toggleSection('modulos-personal')">
+                    <h2><i class="fas fa-spa"></i> Control de Estados de Sauna</h2>
+                    <div class="btn-collapse">
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="admin-controls">
+                        <button onclick="actualizarEstadoModulos()" class="btn-primary">
+                            <i class="fas fa-sync"></i> Actualizar Estados
+                        </button>
+                        <button onclick="mostrarFormularioNuevaSauna()" class="btn-success">
+                            <i class="fas fa-plus"></i> Agregar Nueva Sauna
+                        </button>
+                    </div>
+
+                    <div class="modulos-admin-grid" id="modulos-admin-grid">
+                        <!-- Los módulos se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ventas Rápidas -->
+            <section id="ventas-rapidas" class="section">
+                <div class="section-header-collapsible" onclick="toggleSection('ventas-rapidas')">
+                    <h2><i class="fas fa-cash-register"></i> Registro de Ventas Rápidas</h2>
+                    <div class="btn-collapse">
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
+                </div>
+                <div class="section-content">
+
+                    <!-- Resumen del Día -->
+                    <div class="ventas-resumen">
+                        <div class="resumen-card">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Ventas del Día</span>
+                                <span class="resumen-amount" id="ventas-dia-total">0 Bs</span>
+                            </div>
+                        </div>
+                        <div class="resumen-card">
+                            <i class="fas fa-shopping-bag"></i>
+                            <div class="resumen-info">
+                                <span class="resumen-label">Productos Vendidos</span>
+                                <span class="resumen-amount" id="productos-vendidos-total">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs para tipo de venta -->
+                    <div class="ventas-tabs">
+                        <button class="venta-tab-btn active" onclick="cambiarTipoVenta('producto')">
+                            <i class="fas fa-box"></i> Venta de Producto
+                        </button>
+                        <button class="venta-tab-btn" onclick="cambiarTipoVenta('efectivo')">
+                            <i class="fas fa-money-bill-wave"></i> Ingreso en Efectivo
+                        </button>
+                    </div>
+
+                    <!-- Formulario de Venta de Producto -->
+                    <div class="venta-rapida-form" id="form-venta-producto">
+                        <h3><i class="fas fa-plus-circle"></i> Registrar Venta de Producto</h3>
+                        <form id="form-venta-rapida">
+                            <div class="form-row-ventas">
+                                <div class="form-field-venta">
+                                    <label>Producto:</label>
+                                    <select id="producto-venta" required onchange="actualizarPrecioVenta()">
+                                        <option value="">Seleccionar producto...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                </div>
+                                <div class="form-field-venta">
+                                    <label>Cantidad:</label>
+                                    <input type="number" id="cantidad-venta" min="1" value="1" required
+                                        onchange="calcularTotalVenta()">
+                                </div>
+                                <div class="form-field-venta">
+                                    <label>Precio Unitario:</label>
+                                    <input type="number" id="precio-unitario-venta" step="0.01" readonly>
+                                </div>
+                                <div class="form-field-venta">
+                                    <label>Total:</label>
+                                    <input type="number" id="total-venta" step="0.01" readonly>
+                                </div>
+                                <div class="form-field-venta">
+                                    <label>Método de Pago:</label>
+                                    <select id="metodo-pago-venta" required>
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="qr">QR</option>
+                                    </select>
+                                </div>
+                                <div class="form-field-btn-venta">
+                                    <button type="submit" class="btn-success">
+                                        <i class="fas fa-check"></i> Registrar Venta
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Formulario de Ingreso en Efectivo -->
+                    <div class="venta-rapida-form" id="form-ingreso-efectivo" style="display: none;">
+                        <h3><i class="fas fa-money-bill-wave"></i> Registrar Ingreso en Efectivo</h3>
+                        <form id="form-efectivo-rapido">
+                            <div class="form-row-ventas">
+                                <div class="form-field-venta">
+                                    <label>Monto (Bs):</label>
+                                    <input type="number" id="monto-efectivo" step="0.01" min="0" required
+                                        placeholder="0.00">
+                                </div>
+                                <div class="form-field-venta">
+                                    <label>Concepto:</label>
+                                    <select id="concepto-efectivo" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Venta Directa">Venta Directa</option>
+                                        <option value="Pago Reserva">Pago de Reserva</option>
+                                        <option value="Servicio Sauna">Servicio de Sauna</option>
+                                        <option value="Otros">Otros Ingresos</option>
+                                    </select>
+                                </div>
+                                <div class="form-field-venta" style="grid-column: span 2;">
+                                    <label>Descripción:</label>
+                                    <input type="text" id="descripcion-efectivo"
+                                        placeholder="Detalles del ingreso (opcional)">
+                                </div>
+                                <div class="form-field-btn-venta">
+                                    <button type="submit" class="btn-success">
+                                        <i class="fas fa-check"></i> Registrar Ingreso
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Historial de Ventas del Día -->
+                    <div class="ventas-historial">
+                        <h3><i class="fas fa-history"></i> Ventas de Hoy</h3>
+                        <div class="ventas-lista" id="ventas-lista-hoy">
+                            <!-- Las ventas se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gestión de Inventario -->
+            <section id="productos-personal" class="section">
+                <div class="section-header-collapsible" onclick="toggleSection('productos-personal')">
+                    <h2><i class="fas fa-box"></i> Gestión de Inventario</h2>
+                    <div class="btn-collapse">
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="admin-controls">
+                        <button onclick="mostrarFormularioProducto()" class="btn-primary">
+                            <i class="fas fa-plus"></i> Agregar Nuevo Producto
+                        </button>
+                        <button onclick="exportarInventario()" class="btn-secondary">
+                            <i class="fas fa-download"></i> Exportar Inventario
+                        </button>
+                    </div>
+
+                    <div class="productos-admin-grid" id="productos-admin-grid">
+                        <!-- Los productos se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Modal para configurar estado de módulo -->
+    <div id="modulo-config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarConfiguracionModulo()">&times;</span>
+            <h3 id="modulo-config-title">Configurar Módulo</h3>
+            <form id="modulo-config-form" onsubmit="guardarConfiguracionModulo(event)">
+                <div class="form-group">
+                    <label for="modulo-nombre">Nombre/Número de Sauna:</label>
+                    <input type="text" id="modulo-nombre" placeholder="Ej: Sauna 1, Sauna Familiar A" required>
+                </div>
+                <div class="form-group">
+                    <label for="modulo-tipo">Tipo de Sauna:</label>
+                    <select id="modulo-tipo" required onchange="cambiarEstadoModulo()">
+                        <option value="individual">Individual</option>
+                        <option value="doble">Doble</option>
+                        <option value="semifamiliar">Semifamiliar</option>
+                        <option value="familiar">Familiar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modulo-estado">Estado del Módulo:</label>
+                    <select id="modulo-estado" required onchange="cambiarEstadoModulo()">
+                        <option value="disponible">Disponible</option>
+                        <option value="no-disponible">No Disponible</option>
+                        <option value="reservado">Reservado</option>
+                        <option value="mantenimiento">En Mantenimiento</option>
+                    </select>
+                </div>
+                <div class="form-group" id="temporizador-group" style="display: none;">
+                    <label for="tiempo-mantenimiento">Tiempo de Mantenimiento (minutos):</label>
+                    <input type="number" id="tiempo-mantenimiento" min="15" max="480" step="15">
+                    <small>Mínimo 15 minutos, máximo 8 horas</small>
+                </div>
+                <div class="form-group" id="reserva-group" style="display: none;">
+                    <label for="hora-disponible">Hora que estará disponible:</label>
+                    <input type="datetime-local" id="hora-disponible">
+                    <small>Selecciona cuándo estará disponible el sauna</small>
+                </div>
+                <div class="form-group" id="motivo-group" style="display: none;">
+                    <label for="motivo-estado">Motivo/Observaciones:</label>
+                    <textarea id="motivo-estado" placeholder="Describe el motivo o agrega observaciones"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar Configuración</button>
+                    <button type="button" onclick="cerrarConfiguracionModulo()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar productos -->
+    <div id="producto-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarFormularioProducto()">&times;</span>
+            <h3 id="producto-modal-title">Agregar Producto</h3>
+            <form id="producto-form" onsubmit="guardarProducto(event)">
+                <div class="form-group">
+                    <label for="producto-nombre">Nombre del Producto:</label>
+                    <input type="text" id="producto-nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-categoria">Categoría:</label>
+                    <select id="producto-categoria" required>
+                        <option value="dulces">Dulces</option>
+                        <option value="shampus">Champús</option>
+                        <option value="refrescos">Refrescos</option>
+                        <option value="implementos">Implementos</option>
+                        <option value="otros">Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="producto-precio">Precio (Bs):</label>
+                    <input type="number" id="producto-precio" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-stock">Stock Disponible:</label>
+                    <input type="number" id="producto-stock" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-imagen">Imagen del Producto:</label>
+                    <div class="imagen-tabs">
+                        <button type="button" class="imagen-tab-btn active" onclick="cambiarMetodoImagen('archivo')">
+                            <i class="fas fa-upload"></i> Subir Archivo
+                        </button>
+                        <button type="button" class="imagen-tab-btn" onclick="cambiarMetodoImagen('url')">
+                            <i class="fas fa-link"></i> Desde URL
+                        </button>
+                    </div>
+                    <div id="metodo-archivo" class="metodo-imagen active">
+                        <input type="file" id="producto-imagen" accept="image/*"
+                            onchange="manejarImagenProducto(event)">
+                        <small class="field-help">Formatos: JPG, PNG, GIF (máx. 5MB)</small>
+                    </div>
+                    <div id="metodo-url" class="metodo-imagen">
+                        <input type="url" id="producto-imagen-url" placeholder="https://ejemplo.com/imagen.jpg">
+                        <button type="button" class="btn-cargar-url" onclick="cargarImagenDesdeURL()">
+                            <i class="fas fa-download"></i> Cargar Imagen
+                        </button>
+                        <small class="field-help">Pega la URL de una imagen de internet</small>
+                    </div>
+                    <div id="imagen-preview" class="imagen-preview" style="display: none;">
+                        <img id="preview-img" src="" alt="Vista previa">
+                        <button type="button" class="btn-remove-image" onclick="removerImagenPreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar</button>
+                    <button type="button" onclick="cerrarFormularioProducto()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticación antes de cargar el panel
+        (function () {
+            const sesion = JSON.parse(localStorage.getItem('sesionPersonal'));
+            if (!sesion) {
+                // No hay sesión, redirigir al login
+                window.location.href = 'personal-login.html';
+                return;
+            }
+
+            // Verificar si el usuario está bloqueado
+            const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            const personal = personalRegistrado.find(p => p.id === sesion.personalId);
+
+            if (!personal || personal.bloqueado || !personal.activo) {
+                // Usuario bloqueado o inactivo, cerrar sesión y redirigir
+                localStorage.removeItem('sesionPersonal');
+                alert('Tu cuenta ha sido bloqueada o desactivada. Contacta al administrador.');
+                window.location.href = 'personal-login.html';
+            }
+        })();
+    </script>
+    <script src="admin-script.js"></script>
+    <script src="personal-script.js"></script>
+</body>
+
+</html>

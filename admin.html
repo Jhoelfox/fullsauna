@@ -12,6 +12,32 @@
 </head>
 
 <body>
+    <!-- Verificación de sesión -->
+    <script>
+        // Verificar sesión al cargar la página
+        (function() {
+            const sesion = localStorage.getItem('adminSession');
+            if (!sesion) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            const sesionData = JSON.parse(sesion);
+            const ahora = new Date().getTime();
+            // Sesión válida por 8 horas
+            if (ahora - sesionData.timestamp > 8 * 60 * 60 * 1000) {
+                localStorage.removeItem('adminSession');
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // Actualizar timestamp de la sesión
+            sesionData.timestamp = ahora;
+            localStorage.setItem('adminSession', JSON.stringify(sesionData));
+        })();
+    </script>
+
     <div class="background-animation"></div>
 
     <header class="admin-header auto-hide" id="admin-header">
@@ -26,41 +52,71 @@
                 </div>
             </div>
 
-            <nav class="admin-nav">
-                <a href="#solicitudes-pendientes" class="nav-link" id="nav-solicitudes">
-                    <i class="fas fa-bell"></i>
-                    <span>Solicitudes</span>
-                    <div class="notification-badge" id="solicitudes-badge" style="display: none;">0</div>
-                </a>
-                <a href="#modulos-admin" class="nav-link">
-                    <i class="fas fa-spa"></i>
-                    <span>Módulos</span>
-                </a>
-                <a href="#productos-admin" class="nav-link">
-                    <i class="fas fa-box"></i>
-                    <span>Inventario</span>
-                </a>
-                <a href="#reservas-admin" class="nav-link">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reservas</span>
-                </a>
-                <a href="#usuarios-admin" class="nav-link">
-                    <i class="fas fa-users"></i>
-                    <span>Usuarios</span>
-                </a>
-                <a href="#ingresos" class="nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Ingresos</span>
-                </a>
-                <a href="#configuracion" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Configuración</span>
-                </a>
-                <a href="index.html" target="_blank" class="nav-link external">
-                    <i class="fas fa-external-link-alt"></i>
-                    <span>Ver Sitio</span>
-                </a>
-            </nav>
+            <div class="nav-wrapper">
+                <button class="nav-scroll-btn nav-scroll-left" onclick="scrollNav('left')" title="Scroll izquierda">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <nav class="admin-nav" id="admin-nav">
+                    <a href="#solicitudes-pendientes" class="nav-link" id="nav-solicitudes">
+                        <i class="fas fa-bell"></i>
+                        <span>Solicitudes</span>
+                        <div class="notification-badge" id="solicitudes-badge" style="display: none;">0</div>
+                    </a>
+                    <a href="#modulos-admin" class="nav-link">
+                        <i class="fas fa-spa"></i>
+                        <span>Módulos</span>
+                    </a>
+                    <a href="#productos-admin" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>Inventario</span>
+                    </a>
+                    <a href="#reservas-admin" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Reservas</span>
+                    </a>
+                    <a href="#usuarios-admin" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Usuarios</span>
+                    </a>
+                    <a href="#ingresos" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Ingresos</span>
+                    </a>
+                    <a href="#personal-admin" class="nav-link">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Personal</span>
+                    </a>
+                    <a href="#configuracion" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                    <a href="personal-login.html" target="_blank" class="nav-link external"
+                        style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Panel Personal</span>
+                    </a>
+                    <a href="index.html" target="_blank" class="nav-link external">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Ver Sitio</span>
+                    </a>
+                </nav>
+
+                <button class="nav-scroll-btn nav-scroll-right" onclick="scrollNav('right')" title="Scroll derecha">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <div class="admin-info" id="admin-info">
+                    <i class="fas fa-user-shield"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="cerrarSesion()" class="btn-logout" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Salir</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -68,22 +124,28 @@
         <div class="container">
             <!-- Gestión de Módulos -->
             <section id="modulos-admin" class="section">
-                <h2><i class="fas fa-spa"></i> Gestión de Módulos de Sauna</h2>
-
-                <div class="admin-controls">
-                    <button onclick="actualizarEstadoModulos()" class="btn-primary">
-                        <i class="fas fa-sync"></i> Actualizar Estados
-                    </button>
-                    <button onclick="configurarMantenimiento()" class="btn-warning">
-                        <i class="fas fa-tools"></i> Programar Mantenimiento
-                    </button>
-                    <button onclick="mostrarFormularioNuevaSauna()" class="btn-success">
-                        <i class="fas fa-plus"></i> Agregar Nueva Sauna
-                    </button>
+                <div class="section-header-collapsible" onclick="toggleSection('modulos-admin')">
+                    <h2><i class="fas fa-spa"></i> Gestión de Módulos de Sauna</h2>
+                    <div class="btn-collapse">
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
                 </div>
+                <div class="section-content">
+                    <div class="admin-controls">
+                        <button onclick="actualizarEstadoModulos()" class="btn-primary">
+                            <i class="fas fa-sync"></i> Actualizar Estados
+                        </button>
+                        <button onclick="configurarMantenimiento()" class="btn-warning">
+                            <i class="fas fa-tools"></i> Programar Mantenimiento
+                        </button>
+                        <button onclick="mostrarFormularioNuevaSauna()" class="btn-success">
+                            <i class="fas fa-plus"></i> Agregar Nueva Sauna
+                        </button>
+                    </div>
 
-                <div class="modulos-admin-grid" id="modulos-admin-grid">
-                    <!-- Los módulos se cargarán dinámicamente -->
+                    <div class="modulos-admin-grid" id="modulos-admin-grid">
+                        <!-- Los módulos se cargarán dinámicamente -->
+                    </div>
                 </div>
             </section>
 
@@ -138,20 +200,18 @@
                     </form>
                 </div>
             </div>
+        </div>
+        </section>
 
-            <!-- Solicitudes Pendientes -->
-            <section id="solicitudes-pendientes" class="section">
-                <h2><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h2>
-
-                <div class="solicitudes-container" id="solicitudes-container">
-                    <!-- Las solicitudes se cargarán dinámicamente -->
-                </div>
-            </section>
-
-            <!-- Gestión de Productos -->
-            <section id="productos-admin" class="section">
+        <!-- Gestión de Productos -->
+        <section id="productos-admin" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('productos-admin')">
                 <h2><i class="fas fa-box"></i> Gestión de Inventario</h2>
-
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
                 <div class="admin-controls">
                     <button onclick="mostrarFormularioProducto()" class="btn-primary">
                         <i class="fas fa-plus"></i> Agregar Nuevo Producto
@@ -164,106 +224,108 @@
                 <div class="productos-admin-grid" id="productos-admin-grid">
                     <!-- Los productos se cargarán dinámicamente -->
                 </div>
+            </div>
+        </section>
 
-                <!-- Formulario para agregar/editar productos -->
-                <div id="producto-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="cerrarFormularioProducto()">&times;</span>
-                        <h3 id="producto-modal-title">Agregar Producto</h3>
-                        <form id="producto-form">
-                            <div class="form-group">
-                                <label for="producto-nombre">Nombre del Producto:</label>
-                                <input type="text" id="producto-nombre" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="producto-categoria">Categoría:</label>
-                                <select id="producto-categoria" required>
-                                    <option value="dulces">Dulces</option>
-                                    <option value="shampus">Champús</option>
-                                    <option value="refrescos">Refrescos</option>
-                                    <option value="implementos">Implementos</option>
-                                    <option value="otros">Otros</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="producto-precio">Precio (Bs):</label>
-                                <input type="number" id="producto-precio" step="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="producto-stock">Stock Disponible:</label>
-                                <input type="number" id="producto-stock" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="producto-imagen">Imagen del Producto:</label>
+        <!-- Formulario para agregar/editar productos -->
+        <div id="producto-modal" class="modal">
+            <div class="modal-content"></div>
+            <span class="close" onclick="cerrarFormularioProducto()">&times;</span>
+            <h3 id="producto-modal-title">Agregar Producto</h3>
+            <form id="producto-form">
+                <div class="form-group">
+                    <label for="producto-nombre">Nombre del Producto:</label>
+                    <input type="text" id="producto-nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-categoria">Categoría:</label>
+                    <select id="producto-categoria" required>
+                        <option value="dulces">Dulces</option>
+                        <option value="shampus">Champús</option>
+                        <option value="refrescos">Refrescos</option>
+                        <option value="implementos">Implementos</option>
+                        <option value="otros">Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="producto-precio">Precio (Bs):</label>
+                    <input type="number" id="producto-precio" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-stock">Stock Disponible:</label>
+                    <input type="number" id="producto-stock" required>
+                </div>
+                <div class="form-group">
+                    <label for="producto-imagen">Imagen del Producto:</label>
 
-                                <!-- Tabs para elegir método -->
-                                <div class="imagen-tabs">
-                                    <button type="button" class="imagen-tab-btn active"
-                                        onclick="cambiarMetodoImagen('archivo')">
-                                        <i class="fas fa-upload"></i> Subir Archivo
-                                    </button>
-                                    <button type="button" class="imagen-tab-btn" onclick="cambiarMetodoImagen('url')">
-                                        <i class="fas fa-link"></i> Desde URL
-                                    </button>
-                                    <button type="button" class="imagen-tab-btn"
-                                        onclick="cambiarMetodoImagen('buscar')">
-                                        <i class="fas fa-search"></i> Buscar en Internet
-                                    </button>
-                                </div>
+                    <!-- Tabs para elegir método -->
+                    <div class="imagen-tabs">
+                        <button type="button" class="imagen-tab-btn active" onclick="cambiarMetodoImagen('archivo')">
+                            <i class="fas fa-upload"></i> Subir Archivo
+                        </button>
+                        <button type="button" class="imagen-tab-btn" onclick="cambiarMetodoImagen('url')">
+                            <i class="fas fa-link"></i> Desde URL
+                        </button>
+                        <button type="button" class="imagen-tab-btn" onclick="cambiarMetodoImagen('buscar')">
+                            <i class="fas fa-search"></i> Buscar en Internet
+                        </button>
+                    </div>
 
-                                <!-- Método: Subir archivo -->
-                                <div id="metodo-archivo" class="metodo-imagen active">
-                                    <input type="file" id="producto-imagen" accept="image/*">
-                                    <small class="field-help">Formatos: JPG, PNG, GIF (máx. 5MB)</small>
-                                </div>
+                    <!-- Método: Subir archivo -->
+                    <div id="metodo-archivo" class="metodo-imagen active">
+                        <input type="file" id="producto-imagen" accept="image/*">
+                        <small class="field-help">Formatos: JPG, PNG, GIF (máx. 5MB)</small>
+                    </div>
 
-                                <!-- Método: URL -->
-                                <div id="metodo-url" class="metodo-imagen">
-                                    <input type="url" id="producto-imagen-url"
-                                        placeholder="https://ejemplo.com/imagen.jpg">
-                                    <button type="button" class="btn-cargar-url" onclick="cargarImagenDesdeURL()">
-                                        <i class="fas fa-download"></i> Cargar Imagen
-                                    </button>
-                                    <small class="field-help">Pega la URL de una imagen de internet</small>
-                                </div>
+                    <!-- Método: URL -->
+                    <div id="metodo-url" class="metodo-imagen">
+                        <input type="url" id="producto-imagen-url" placeholder="https://ejemplo.com/imagen.jpg">
+                        <button type="button" class="btn-cargar-url" onclick="cargarImagenDesdeURL()">
+                            <i class="fas fa-download"></i> Cargar Imagen
+                        </button>
+                        <small class="field-help">Pega la URL de una imagen de internet</small>
+                    </div>
 
-                                <!-- Método: Buscar -->
-                                <div id="metodo-buscar" class="metodo-imagen">
-                                    <div class="buscador-imagenes">
-                                        <input type="text" id="buscar-imagen-query"
-                                            placeholder="Buscar imagen... (ej: sauna, toalla, champú)">
-                                        <button type="button" class="btn-buscar-imagen" onclick="buscarImagenes()">
-                                            <i class="fas fa-search"></i> Buscar
-                                        </button>
-                                    </div>
-                                    <div id="resultados-busqueda" class="resultados-busqueda">
-                                        <!-- Los resultados aparecerán aquí -->
-                                    </div>
-                                    <small class="field-help">Busca imágenes gratuitas de Unsplash</small>
-                                </div>
+                    <!-- Método: Buscar -->
+                    <div id="metodo-buscar" class="metodo-imagen">
+                        <div class="buscador-imagenes">
+                            <input type="text" id="buscar-imagen-query"
+                                placeholder="Buscar imagen... (ej: sauna, toalla, champú)">
+                            <button type="button" class="btn-buscar-imagen" onclick="buscarImagenes()">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <div id="resultados-busqueda" class="resultados-busqueda">
+                            <!-- Los resultados aparecerán aquí -->
+                        </div>
+                        <small class="field-help">Busca imágenes gratuitas de Unsplash</small>
+                    </div>
 
-                                <!-- Vista previa -->
-                                <div id="imagen-preview" class="imagen-preview" style="display: none;">
-                                    <img id="preview-img" src="" alt="Vista previa">
-                                    <button type="button" class="btn-remove-image" onclick="removerImagenPreview()">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn-primary">Guardar</button>
-                                <button type="button" onclick="cerrarFormularioProducto()"
-                                    class="btn-secondary">Cancelar</button>
-                            </div>
-                        </form>
+                    <!-- Vista previa -->
+                    <div id="imagen-preview" class="imagen-preview" style="display: none;">
+                        <img id="preview-img" src="" alt="Vista previa">
+                        <button type="button" class="btn-remove-image" onclick="removerImagenPreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
-            </section>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar</button>
+                    <button type="button" onclick="cerrarFormularioProducto()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+        </div>
 
-            <!-- Gestión de Reservas -->
-            <section id="reservas-admin" class="section">
+        <!-- Gestión de Reservas -->
+        <section id="reservas-admin" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('reservas-admin')">
                 <h2><i class="fas fa-calendar-check"></i> Historial de Reservas</h2>
-
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
                 <!-- Filtros de Reservas -->
                 <div class="filtros-reservas">
                     <div class="filtro-grupo">
@@ -328,12 +390,18 @@
                 <div class="reservas-admin-grid" id="reservas-admin-grid">
                     <!-- Las reservas se cargarán dinámicamente -->
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Ingresos -->
-            <section id="ingresos" class="section">
+        <!-- Ingresos -->
+        <section id="ingresos" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('ingresos')">
                 <h2><i class="fas fa-chart-line"></i> Panel de Ingresos</h2>
-
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
                 <div class="ingresos-summary">
                     <div class="ingreso-card">
                         <h3><i class="fas fa-money-bill-wave"></i> Ingresos del Día</h3>
@@ -375,14 +443,49 @@
                 <div class="gestion-caja">
                     <h3><i class="fas fa-cash-register"></i> Historial de Movimientos de Caja</h3>
 
-                    <!-- Acciones de Caja -->
+                    <!-- Formulario Rápido de Ingreso -->
+                    <div class="ingreso-rapido-container">
+                        <h4><i class="fas fa-plus-circle"></i> Registrar Ingreso Rápido</h4>
+                        <form id="ingreso-rapido-form" class="ingreso-rapido-form">
+                            <div class="form-row">
+                                <div class="form-field">
+                                    <label>Monto (Bs):</label>
+                                    <input type="number" id="monto-rapido" step="0.01" min="0" required
+                                        placeholder="0.00">
+                                </div>
+                                <div class="form-field">
+                                    <label>Concepto:</label>
+                                    <select id="concepto-rapido" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Saldo Inicial">Saldo Inicial</option>
+                                        <option value="Venta Directa">Venta Directa</option>
+                                        <option value="Pago Reserva">Pago de Reserva</option>
+                                        <option value="Productos">Venta de Productos</option>
+                                        <option value="Otros">Otros Ingresos</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label>Método:</label>
+                                    <select id="metodo-rapido" required>
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="qr">QR</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label>Descripción:</label>
+                                    <input type="text" id="descripcion-rapido" placeholder="Opcional">
+                                </div>
+                                <div class="form-field-btn">
+                                    <button type="submit" class="btn-success">
+                                        <i class="fas fa-check"></i> Registrar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Botón de Retiro -->
                     <div class="caja-actions">
-                        <button onclick="mostrarModalSaldoInicial()" class="btn-primary">
-                            <i class="fas fa-wallet"></i> Saldo Inicial
-                        </button>
-                        <button onclick="mostrarModalIngreso()" class="btn-success">
-                            <i class="fas fa-plus-circle"></i> Registrar Ingreso
-                        </button>
                         <button onclick="mostrarModalRetiro()" class="btn-warning">
                             <i class="fas fa-minus-circle"></i> Registrar Retiro
                         </button>
@@ -458,92 +561,271 @@
                         <!-- Los movimientos se cargarán dinámicamente -->
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Gestión de Usuarios Registrados -->
-            <section id="usuarios-admin" class="section">
-                <h2><i class="fas fa-users"></i> Usuarios Registrados</h2>
-
-                <div class="usuarios-stats">
-                    <div class="stat-card">
-                        <i class="fas fa-user-plus"></i>
-                        <div class="stat-info">
-                            <span class="stat-number" id="total-usuarios">0</span>
-                            <span class="stat-label">Total Usuarios</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-calendar-day"></i>
-                        <div class="stat-info">
-                            <span class="stat-number" id="usuarios-hoy">0</span>
-                            <span class="stat-label">Registros Hoy</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-calendar-week"></i>
-                        <div class="stat-info">
-                            <span class="stat-number" id="usuarios-semana">0</span>
-                            <span class="stat-label">Esta Semana</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-star"></i>
-                        <div class="stat-info">
-                            <span class="stat-number" id="usuarios-activos">0</span>
-                            <span class="stat-label">Usuarios Activos</span>
-                        </div>
+        <!-- Gestión de Usuarios Registrados -->
+        <section id="usuarios-admin" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('usuarios-admin')">
+                <h2><i class="fas fa-users"></i> Usuarios y Solicitudes</h2>
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <!-- Solicitudes de Pago Pendientes -->
+                <div class="subseccion-usuarios">
+                    <h3><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h3>
+                    <div class="solicitudes-container" id="solicitudes-container">
+                        <!-- Las solicitudes se cargarán dinámicamente -->
                     </div>
                 </div>
 
-                <div class="usuarios-filtros">
-                    <input type="text" id="buscar-usuario" placeholder="Buscar por nombre, email o teléfono..."
-                        onkeyup="filtrarUsuarios()">
-                    <select id="filtro-ciudad" onchange="filtrarUsuarios()">
-                        <option value="">Todas las ciudades</option>
-                        <option value="La Paz">La Paz</option>
-                        <option value="Santa Cruz">Santa Cruz</option>
-                        <option value="Cochabamba">Cochabamba</option>
-                        <option value="Oruro">Oruro</option>
-                        <option value="Potosí">Potosí</option>
-                        <option value="Tarija">Tarija</option>
-                        <option value="Sucre">Sucre</option>
-                        <option value="Beni">Beni</option>
-                        <option value="Pando">Pando</option>
-                        <option value="Otra">Otra</option>
-                    </select>
-                    <button onclick="exportarUsuarios()" class="btn-primary">
+                <!-- Usuarios Registrados -->
+                <div class="subseccion-usuarios">
+                    <h3><i class="fas fa-user-friends"></i> Lista de Usuarios Registrados</h3>
+                </div>
+
+                <div class="usuarios-stats"></div>
+                <div class="stat-card">
+                    <i class="fas fa-user-plus"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="total-usuarios">0</span>
+                        <span class="stat-label">Total Usuarios</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-day"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="usuarios-hoy">0</span>
+                        <span class="stat-label">Registros Hoy</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-week"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="usuarios-semana">0</span>
+                        <span class="stat-label">Esta Semana</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="usuarios-activos">0</span>
+                        <span class="stat-label">Usuarios Activos</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usuarios-filtros">
+                <input type="text" id="buscar-usuario" placeholder="Buscar por nombre, email o teléfono..."
+                    onkeyup="filtrarUsuarios()">
+                <select id="filtro-ciudad" onchange="filtrarUsuarios()">
+                    <option value="">Todas las ciudades</option>
+                    <option value="La Paz">La Paz</option>
+                    <option value="Santa Cruz">Santa Cruz</option>
+                    <option value="Cochabamba">Cochabamba</option>
+                    <option value="Oruro">Oruro</option>
+                    <option value="Potosí">Potosí</option>
+                    <option value="Tarija">Tarija</option>
+                    <option value="Sucre">Sucre</option>
+                    <option value="Beni">Beni</option>
+                    <option value="Pando">Pando</option>
+                    <option value="Otra">Otra</option>
+                </select>
+                <button onclick="exportarUsuarios()" class="btn-primary">
+                    <i class="fas fa-download"></i> Exportar Lista
+                </button>
+            </div>
+
+            <div class="usuarios-tabla-container">
+                <table class="usuarios-tabla" id="usuarios-tabla">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Ciudad</th>
+                            <th>Fecha Registro</th>
+                            <th><i class="fas fa-circle"></i> Estado</th>
+                            <th><i class="fas fa-chart-line"></i> Stats</th>
+                            <th>Reservas</th>
+                            <th>Notificaciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuarios-tbody">
+                        <!-- Los usuarios se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </section>
+
+        <!-- Gestión de Personal -->
+        <section id="personal-admin" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('personal-admin')">
+                <h2><i class="fas fa-user-tie"></i> Gestión de Personal</h2>
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
+
+                <!-- Generar Códigos de Acceso -->
+                <div class="codigos-acceso-container">
+                    <h3><i class="fas fa-key"></i> Generar Códigos de Acceso</h3>
+                    <div
+                        style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #2196f3;">
+                        <p style="color: #1976d2; margin: 0; font-size: 0.9rem;">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Registro automático:</strong> El personal que se registra con un código de acceso
+                            aparece directamente en la tabla de personal registrado, sin necesidad de aprobación.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <input type="number" id="cantidad-codigos" min="1" max="50" value="1" placeholder="Cantidad"
+                            style="width: 100px; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <button onclick="generarCodigosAcceso()" class="btn-primary">
+                            <i class="fas fa-plus-circle"></i> Generar Códigos
+                        </button>
+                        <button onclick="verCodigosDisponibles()" class="btn-secondary">
+                            <i class="fas fa-list"></i> Ver Códigos Disponibles
+                        </button>
+                        <button onclick="window.open('diagnostico-completo.html', '_blank')" class="btn-secondary"
+                            style="background: #9b59b6; border-color: #9b59b6;">
+                            <i class="fas fa-tools"></i> Diagnóstico del Sistema
+                        </button>
+                    </div>
+                    <div id="codigos-generados-lista" style="display: none;">
+                        <!-- Los códigos generados aparecerán aquí -->
+                    </div>
+                </div>
+
+                <!-- Solicitudes Pendientes -->
+                <div class="solicitudes-personal-container">
+                    <h3><i class="fas fa-clock"></i> Solicitudes Pendientes de Aprobación</h3>
+                    <div
+                        style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #ffc107;">
+                        <p style="color: #856404; margin: 0; font-size: 0.9rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Esta sección solo muestra solicitudes de personal que NO tiene código de acceso. El personal
+                            registrado con código aparece directamente en la tabla inferior.
+                        </p>
+                    </div>
+                    <div id="solicitudes-personal-lista" class="solicitudes-personal-lista">
+                        <!-- Las solicitudes se cargarán dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="admin-controls">
+                    <button onclick="exportarPersonal()" class="btn-secondary">
                         <i class="fas fa-download"></i> Exportar Lista
+                    </button>
+                    <button onclick="verRegistroActividad()" class="btn-primary">
+                        <i class="fas fa-chart-line"></i> Ver Registro de Actividad
                     </button>
                 </div>
 
-                <div class="usuarios-tabla-container">
-                    <table class="usuarios-tabla" id="usuarios-tabla">
+                <!-- Herramientas de Diagnóstico -->
+                <div
+                    style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem; border-left: 4px solid #9b59b6;">
+                    <h3 style="color: #9b59b6; margin-bottom: 1rem;">
+                        <i class="fas fa-tools"></i> Herramientas de Diagnóstico
+                    </h3>
+                    <p style="color: #7f8c8d; margin-bottom: 1rem; font-size: 0.9rem;">
+                        Herramientas para probar y diagnosticar el sistema de códigos y registro de personal
+                    </p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button onclick="window.open('diagnostico-completo.html', '_blank')" class="btn-secondary"
+                            style="background: #9b59b6; border-color: #9b59b6;">
+                            <i class="fas fa-stethoscope"></i> Diagnóstico Completo
+                        </button>
+                        <button onclick="window.open('test-validacion-codigos.html', '_blank')" class="btn-secondary"
+                            style="background: #3498db; border-color: #3498db;">
+                            <i class="fas fa-vial"></i> Test de Validación
+                        </button>
+                        <button onclick="window.open('test-codigos.html', '_blank')" class="btn-secondary"
+                            style="background: #e67e22; border-color: #e67e22;">
+                            <i class="fas fa-flask"></i> Test de Códigos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estadísticas de Personal -->
+                <div class="personal-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-personal">0</span>
+                            <span class="stat-label">Total Personal</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-check"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="personal-activo">0</span>
+                            <span class="stat-label">Personal Activo</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-lock"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="personal-bloqueado">0</span>
+                            <span class="stat-label">Personal Bloqueado</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="accesos-hoy">0</span>
+                            <span class="stat-label">Accesos Hoy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Personal -->
+                <div class="personal-tabla-container">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin: 0;"><i class="fas fa-users"></i> Personal Registrado</h3>
+                        <span
+                            style="background: #e8f5e9; color: #27ae60; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;">
+                            <i class="fas fa-check-circle"></i> Registro completado
+                        </span>
+                    </div>
+                    <table class="personal-tabla">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>Código</th>
                                 <th>Nombre Completo</th>
+                                <th>C.I.</th>
                                 <th>Email</th>
                                 <th>Teléfono</th>
-                                <th>Ciudad</th>
                                 <th>Fecha Registro</th>
-                                <th><i class="fas fa-circle"></i> Estado</th>
-                                <th><i class="fas fa-chart-line"></i> Stats</th>
-                                <th>Reservas</th>
-                                <th>Notificaciones</th>
+                                <th>Último Acceso</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="usuarios-tbody">
-                            <!-- Los usuarios se cargarán dinámicamente -->
+                        <tbody id="personal-tbody">
+                            <!-- El personal se cargará dinámicamente -->
                         </tbody>
                     </table>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Configuración del Sistema -->
-            <section id="configuracion" class="section">
+        <!-- Configuración del Sistema -->
+        <section id="configuracion" class="section">
+            <div class="section-header-collapsible" onclick="toggleSection('configuracion')">
                 <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
-
+                <div class="btn-collapse">
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="section-content">
                 <div class="config-grid">
                     <div class="config-card">
                         <h3><i class="fas fa-database"></i> Gestión de Datos</h3>
@@ -619,10 +901,65 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="config-card">
+                        <h3><i class="fas fa-address-book"></i> Información de Contacto</h3>
+                        <p>Gestiona los datos de contacto y ubicación que aparecen en la página principal</p>
+                        <div class="config-actions">
+                            <button onclick="abrirEditorContacto()" class="btn-primary">
+                                <i class="fas fa-edit"></i> Editar Información de Contacto
+                            </button>
+                            <button onclick="verVistaPrevia()" class="btn-secondary">
+                                <i class="fas fa-eye"></i> Ver Vista Previa
+                            </button>
+                        </div>
+                        <div class="contacto-preview" id="contacto-preview">
+                            <div class="preview-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="preview-telefono1">62975072</span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="preview-telefono2">72340226</span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="preview-ubicacion">Vida en Cristo DASS, El Jordán</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-card">
+                        <h3><i class="fas fa-key"></i> Seguridad y Acceso</h3>
+                        <p>Gestiona las credenciales de acceso al panel de administración</p>
+                        <div class="config-actions">
+                            <button onclick="abrirCambiarCredenciales()" class="btn-warning">
+                                <i class="fas fa-user-lock"></i> Cambiar Usuario y Contraseña
+                            </button>
+                            <button onclick="verHistorialAccesos()" class="btn-secondary">
+                                <i class="fas fa-history"></i> Ver Historial de Accesos
+                            </button>
+                        </div>
+                        <div class="contacto-preview" id="credenciales-preview">
+                            <div class="preview-item">
+                                <i class="fas fa-user"></i>
+                                <span id="preview-username">Usuario actual</span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span style="color: #27ae60;">Sesión activa</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </main>
+
+    <!-- Botón Flotante para Colapsar/Expandir Todo -->
+    <button id="btn-toggle-all" class="btn-toggle-all" onclick="toggleAllSections()" title="Minimizar/Expandir Todo">
+        <i class="fas fa-compress-alt"></i>
+    </button>
 
     <!-- Modal para Saldo Inicial -->
     <div id="saldo-inicial-modal" class="modal">
@@ -655,35 +992,35 @@
     </div>
 
     <!-- Modal para Ingreso en Efectivo -->
-    <div id="ingreso-modal" class="modal"></div>
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModalIngreso()">&times;</span>
-        <h3>Registrar Ingreso en Efectivo</h3>
-        <form id="ingreso-form">
-            <div class="form-group">
-                <label for="monto-ingreso">Monto en Efectivo (Bs):</label>
-                <input type="number" id="monto-ingreso" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="concepto-ingreso">Concepto del Ingreso:</label>
-                <select id="concepto-ingreso" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="venta-directa">Venta Directa</option>
-                    <option value="pago-reserva">Pago de Reserva</option>
-                    <option value="productos">Venta de Productos</option>
-                    <option value="otros">Otros Ingresos</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="descripcion-ingreso">Descripción (opcional):</label>
-                <textarea id="descripcion-ingreso" placeholder="Detalles adicionales del ingreso"></textarea>
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="btn-success">Registrar Ingreso</button>
-                <button type="button" onclick="cerrarModalIngreso()" class="btn-secondary">Cancelar</button>
-            </div>
-        </form>
-    </div>
+    <div id="ingreso-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalIngreso()">&times;</span>
+            <h3>Registrar Ingreso en Efectivo</h3>
+            <form id="ingreso-form">
+                <div class="form-group">
+                    <label for="monto-ingreso">Monto en Efectivo (Bs):</label>
+                    <input type="number" id="monto-ingreso" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="concepto-ingreso">Concepto del Ingreso:</label>
+                    <select id="concepto-ingreso" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="venta-directa">Venta Directa</option>
+                        <option value="pago-reserva">Pago de Reserva</option>
+                        <option value="productos">Venta de Productos</option>
+                        <option value="otros">Otros Ingresos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-ingreso">Descripción (opcional):</label>
+                    <textarea id="descripcion-ingreso" placeholder="Detalles adicionales del ingreso"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-success">Registrar Ingreso</button>
+                    <button type="button" onclick="cerrarModalIngreso()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal para Retiro de Dinero -->
@@ -801,48 +1138,48 @@
     </div>
 
     <!-- Modal Flotante para Solicitudes Pendientes -->
-    <div id="solicitudes-modal" class="modal solicitudes-modal"></div>
-    <div class="modal-content solicitudes-modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h3>
-            <span class="close" onclick="cerrarSolicitudesModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="solicitudes-stats">
-                <div class="stat-card">
-                    <i class="fas fa-clock"></i>
-                    <div class="stat-info">
-                        <span class="stat-number" id="total-solicitudes">0</span>
-                        <span class="stat-label">Total Pendientes</span>
+    <div id="solicitudes-modal" class="modal solicitudes-modal">
+        <div class="modal-content solicitudes-modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-bell"></i> Solicitudes de Pago Pendientes</h3>
+                <span class="close" onclick="cerrarSolicitudesModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="solicitudes-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-solicitudes">0</span>
+                            <span class="stat-label">Total Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <div class="stat-info">
+                            <span class="stat-number" id="monto-total-solicitudes">0 Bs</span>
+                            <span class="stat-label">Monto Total</span>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <div class="stat-info">
-                        <span class="stat-number" id="monto-total-solicitudes">0 Bs</span>
-                        <span class="stat-label">Monto Total</span>
-                    </div>
+
+                <div class="solicitudes-filtros">
+                    <input type="text" id="buscar-solicitud" placeholder="Buscar por cliente o ID..."
+                        onkeyup="filtrarSolicitudes()">
+                    <select id="filtro-estado-solicitud" onchange="filtrarSolicitudes()">
+                        <option value="todas">Todas las solicitudes</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="procesando">En proceso</option>
+                    </select>
+                    <button onclick="actualizarSolicitudes()" class="btn-primary btn-small">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+
+                <div class="solicitudes-lista" id="solicitudes-lista">
+                    <!-- Las solicitudes se cargarán aquí -->
                 </div>
             </div>
-
-            <div class="solicitudes-filtros">
-                <input type="text" id="buscar-solicitud" placeholder="Buscar por cliente o ID..."
-                    onkeyup="filtrarSolicitudes()">
-                <select id="filtro-estado-solicitud" onchange="filtrarSolicitudes()">
-                    <option value="todas">Todas las solicitudes</option>
-                    <option value="pendiente">Pendientes</option>
-                    <option value="procesando">En proceso</option>
-                </select>
-                <button onclick="actualizarSolicitudes()" class="btn-primary btn-small">
-                    <i class="fas fa-sync"></i> Actualizar
-                </button>
-            </div>
-
-            <div class="solicitudes-lista" id="solicitudes-lista">
-                <!-- Las solicitudes se cargarán aquí -->
-            </div>
         </div>
-    </div>
     </div>
 
     <!-- Modal de Editor de Colores -->
@@ -1008,56 +1345,306 @@
         </div>
     </div>
 
+    <!-- Modal de Selección de Período para Exportar -->
+    <div id="modal-periodo-exportar" class="modal" style="display: none;">
+        <div class="modal-content modal-periodo">
+            <span class="close" onclick="cerrarModalPeriodo()">&times;</span>
+            <h3><i class="fas fa-calendar-alt"></i> Seleccionar Período de Exportación</h3>
+
+            <p class="modal-descripcion">Selecciona el período de tiempo que deseas exportar:</p>
+
+            <div class="periodo-opciones">
+                <button class="periodo-btn" onclick="confirmarExportacion('1dia')">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>1 Día</span>
+                    <small>Últimas 24 horas</small>
+                </button>
+
+                <button class="periodo-btn" onclick="confirmarExportacion('1semana')">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>1 Semana</span>
+                    <small>Últimos 7 días</small>
+                </button>
+
+                <button class="periodo-btn" onclick="confirmarExportacion('1mes')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>1 Mes</span>
+                    <small>Últimos 30 días</small>
+                </button>
+
+                <button class="periodo-btn" onclick="confirmarExportacion('1ano')">
+                    <i class="fas fa-calendar"></i>
+                    <span>1 Año</span>
+                    <small>Últimos 365 días</small>
+                </button>
+
+                <button class="periodo-btn periodo-todo" onclick="confirmarExportacion('todo')">
+                    <i class="fas fa-infinity"></i>
+                    <span>Todo</span>
+                    <small>Todos los registros</small>
+                </button>
+            </div>
+
+            <div class="modal-actions-periodo">
+                <button onclick="cerrarModalPeriodo()" class="btn-cancelar-periodo">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para aprobar solicitud -->
+    <div id="aprobar-solicitud-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalAprobarSolicitud()">&times;</span>
+            <h3><i class="fas fa-user-check"></i> Aprobar Solicitud de Personal</h3>
+            <div id="datos-solicitud"
+                style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <!-- Los datos se cargarán dinámicamente -->
+            </div>
+            <div class="form-group">
+                <label>Código de Acceso Generado:</label>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" id="codigo-generado" readonly
+                        style="flex: 1; background: #f5f5f5; font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 3px; font-size: 1.2rem; text-align: center; color: #27ae60;">
+                    <button type="button" onclick="generarCodigoAleatorio()" class="btn-secondary">
+                        <i class="fas fa-sync"></i> Regenerar
+                    </button>
+                </div>
+                <small>Este código se enviará automáticamente al correo del solicitante</small>
+            </div>
+            <div class="form-actions">
+                <button onclick="confirmarAprobacion()" class="btn-success">
+                    <i class="fas fa-check"></i> Aprobar y Enviar Código
+                </button>
+                <button onclick="rechazarSolicitud()" class="btn-danger">
+                    <i class="fas fa-times"></i> Rechazar Solicitud
+                </button>
+                <button onclick="cerrarModalAprobarSolicitud()" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro de Actividad -->
+    <div id="actividad-modal" class="modal">
+        <div class="modal-content large-modal">
+            <span class="close" onclick="cerrarModalActividad()">&times;</span>
+            <h3><i class="fas fa-chart-line"></i> Registro de Actividad del Personal</h3>
+
+            <div class="actividad-filtros">
+                <select id="filtro-personal-actividad" onchange="filtrarActividad()">
+                    <option value="todos">Todo el Personal</option>
+                </select>
+                <input type="date" id="filtro-fecha-actividad" onchange="filtrarActividad()">
+                <button onclick="exportarActividad()" class="btn-secondary">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+            </div>
+
+            <div class="actividad-lista" id="actividad-lista">
+                <!-- La actividad se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Información de Contacto -->
+    <div id="contacto-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="cerrarModalContacto()">&times;</span>
+            <h3><i class="fas fa-address-book"></i> Editar Información de Contacto</h3>
+
+            <form id="form-contacto" onsubmit="guardarContacto(event)">
+                <div style="display: grid; gap: 1.5rem; margin-top: 1.5rem;">
+                    
+                    <!-- Teléfonos -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-phone"></i> Teléfonos de Contacto</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="telefono1">Teléfono 1 (WhatsApp)</label>
+                                <input type="tel" id="telefono1" placeholder="62975072" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono2">Teléfono 2 (WhatsApp)</label>
+                                <input type="tel" id="telefono2" placeholder="72340226" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ubicación -->
+                    <div class="form-section" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);">
+                        <h4><i class="fas fa-map-marker-alt"></i> Ubicación del Negocio</h4>
+                        <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label for="ubicacion-nombre">
+                                    <i class="fas fa-building"></i> Nombre del Lugar
+                                </label>
+                                <input type="text" id="ubicacion-nombre" placeholder="Ej: Vida en Cristo DASS" required>
+                                <small style="color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Este nombre aparecerá en el mapa y en la sección de contacto
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacion-direccion">
+                                    <i class="fas fa-map-marked-alt"></i> Dirección Completa
+                                </label>
+                                <input type="text" id="ubicacion-direccion" placeholder="Ej: El Jordán, La Paz - Bolivia" required>
+                                <small style="color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Incluye zona, ciudad y país para mejor precisión
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacion-referencia">
+                                    <i class="fas fa-landmark"></i> Referencias (Opcional)
+                                </label>
+                                <input type="text" id="ubicacion-referencia" placeholder="Ej: Cerca de la plaza principal">
+                                <small style="color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Puntos de referencia para facilitar la ubicación
+                                </small>
+                            </div>
+                        </div>
+                        <button type="button" onclick="buscarEnGoogleMaps()" class="btn-secondary" style="width: 100%; background: #4285F4; color: white; border: none;">
+                            <i class="fas fa-search-location"></i> Buscar en Google Maps
+                        </button>
+                    </div>
+
+                    <!-- Horarios -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-clock"></i> Horarios de Atención</h4>
+                        <div class="form-group">
+                            <label for="horario-dias">Días de Atención</label>
+                            <input type="text" id="horario-dias" placeholder="Lunes a Domingo" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="horario-inicio">Hora de Apertura</label>
+                                <input type="time" id="horario-inicio" value="08:00" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="horario-fin">Hora de Cierre</label>
+                                <input type="time" id="horario-fin" value="22:00" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mapa -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-map"></i> Mapa de Google</h4>
+                        <div class="form-group">
+                            <label for="mapa-url">URL del Mapa (iframe src)</label>
+                            <textarea id="mapa-url" rows="3" placeholder="https://www.google.com/maps/embed?pb=..." style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 0.9rem;"></textarea>
+                            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> 
+                                Para obtener el código: Google Maps → Compartir → Insertar un mapa → Copiar solo la URL del src
+                            </small>
+                        </div>
+                        <button type="button" onclick="abrirAyudaMapa()" class="btn-secondary" style="width: 100%;">
+                            <i class="fas fa-question-circle"></i> ¿Cómo obtener el código del mapa?
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de WhatsApp -->
+                    <div class="form-section">
+                        <h4><i class="fab fa-whatsapp"></i> Mensaje Predefinido de WhatsApp</h4>
+                        <div class="form-group">
+                            <label for="whatsapp-mensaje">Mensaje Inicial</label>
+                            <textarea id="whatsapp-mensaje" rows="2" placeholder="Hola, quisiera información sobre el sauna" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn-primary" style="flex: 1;">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <button type="button" onclick="cerrarModalContacto()" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Cambiar Credenciales -->
+    <div id="credenciales-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="cerrarModalCredenciales()">&times;</span>
+            <h3><i class="fas fa-user-lock"></i> Cambiar Usuario y Contraseña</h3>
+
+            <form id="form-credenciales" onsubmit="guardarCredenciales(event)">
+                <div style="display: grid; gap: 1.5rem; margin-top: 1.5rem;">
+                    
+                    <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <p style="margin: 0; color: #856404; font-size: 0.9rem;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Importante:</strong> Guarda tus nuevas credenciales en un lugar seguro. No podrás recuperarlas si las olvidas.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nuevo-usuario">
+                            <i class="fas fa-user"></i> Nuevo Usuario
+                        </label>
+                        <input type="text" id="nuevo-usuario" placeholder="Ingresa el nuevo usuario" required>
+                        <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                            Puede ser tu nombre completo o un nombre de usuario
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nueva-password">
+                            <i class="fas fa-lock"></i> Nueva Contraseña
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="password" id="nueva-password" placeholder="Ingresa la nueva contraseña" required minlength="6">
+                            <button type="button" class="toggle-password" onclick="togglePasswordField('nueva-password', 'toggle-icon-1')">
+                                <i class="fas fa-eye" id="toggle-icon-1"></i>
+                            </button>
+                        </div>
+                        <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
+                            Mínimo 6 caracteres
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmar-password">
+                            <i class="fas fa-lock"></i> Confirmar Contraseña
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmar-password" placeholder="Confirma la nueva contraseña" required minlength="6">
+                            <button type="button" class="toggle-password" onclick="togglePasswordField('confirmar-password', 'toggle-icon-2')">
+                                <i class="fas fa-eye" id="toggle-icon-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password-actual">
+                            <i class="fas fa-shield-alt"></i> Contraseña Actual (para confirmar)
+                        </label>
+                        <input type="password" id="password-actual" placeholder="Ingresa tu contraseña actual" required>
+                    </div>
+
+                </div>
+
+                <div class="modal-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn-warning" style="flex: 1;">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <button type="button" onclick="cerrarModalCredenciales()" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="admin-script.js"></script>
+    <script src="personal-admin-functions.js"></script>
 </body>
 
 </html>
-
-
-<!-- Modal de Selección de Período para Exportar -->
-<div id="modal-periodo-exportar" class="modal" style="display: none;">
-    <div class="modal-content modal-periodo">
-        <span class="close" onclick="cerrarModalPeriodo()">&times;</span>
-        <h3><i class="fas fa-calendar-alt"></i> Seleccionar Período de Exportación</h3>
-
-        <p class="modal-descripcion">Selecciona el período de tiempo que deseas exportar:</p>
-
-        <div class="periodo-opciones">
-            <button class="periodo-btn" onclick="confirmarExportacion('1dia')">
-                <i class="fas fa-calendar-day"></i>
-                <span>1 Día</span>
-                <small>Últimas 24 horas</small>
-            </button>
-
-            <button class="periodo-btn" onclick="confirmarExportacion('1semana')">
-                <i class="fas fa-calendar-week"></i>
-                <span>1 Semana</span>
-                <small>Últimos 7 días</small>
-            </button>
-
-            <button class="periodo-btn" onclick="confirmarExportacion('1mes')">
-                <i class="fas fa-calendar-alt"></i>
-                <span>1 Mes</span>
-                <small>Últimos 30 días</small>
-            </button>
-
-            <button class="periodo-btn" onclick="confirmarExportacion('1ano')">
-                <i class="fas fa-calendar"></i>
-                <span>1 Año</span>
-                <small>Últimos 365 días</small>
-            </button>
-
-            <button class="periodo-btn periodo-todo" onclick="confirmarExportacion('todo')">
-                <i class="fas fa-infinity"></i>
-                <span>Todo</span>
-                <small>Todos los registros</small>
-            </button>
-        </div>
-
-        <div class="modal-actions-periodo">
-            <button onclick="cerrarModalPeriodo()" class="btn-cancelar-periodo">
-                <i class="fas fa-times"></i> Cancelar
-            </button>
-        </div>
-    </div>
-</div>

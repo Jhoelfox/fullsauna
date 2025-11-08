@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Personal - Sauna C y G</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            padding: 3rem;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+        }
+
+        .login-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .login-form {
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .login-footer p {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-footer a {
+            color: #27ae60;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #27ae60;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box i {
+            color: #27ae60;
+            margin-right: 0.5rem;
+        }
+
+        .info-box p {
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h1>Acceso Personal</h1>
+            <p>Sauna C y G - El Jordán</p>
+        </div>
+
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <p>Ingresa el código de usuario que te proporcionó el administrador</p>
+        </div>
+
+        <div class="error-message" id="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="error-text">Código de usuario inválido</span>
+        </div>
+
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label for="codigo-usuario">Código de Usuario</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="codigo-usuario" placeholder="XXXX-XXXX" required maxlength="9"
+                        autocomplete="off">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i>
+                Ingresar al Panel
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>¿No tienes un código de acceso?</p>
+            <a href="personal-registro.html" style="display: inline-block; margin: 1rem 0; padding: 0.75rem 2rem; background: #667eea; color: white; text-decoration: none; border-radius: 8px;">
+                <i class="fas fa-user-plus"></i> Registrarse como Personal
+            </a>
+            <br>
+            <a href="index.html">
+                <i class="fas fa-home"></i> Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const codigoInput = document.getElementById('codigo-usuario');
+            const codigo = codigoInput.value.trim().toUpperCase();
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+
+            // Obtener personal registrado
+            const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+
+            // Buscar el código
+            const personal = personalRegistrado.find(p => p.codigo === codigo);
+
+            if (personal && personal.activo && !personal.bloqueado) {
+                // Código válido - guardar sesión y redirigir
+                const sesion = {
+                    personalId: personal.id,
+                    nombre: personal.nombre,
+                    codigo: personal.codigo,
+                    fechaIngreso: new Date().toISOString()
+                };
+
+                localStorage.setItem('sesionPersonal', JSON.stringify(sesion));
+
+                // Registrar acceso
+                const accesos = JSON.parse(localStorage.getItem('accesosPersonal')) || [];
+                accesos.push({
+                    personalId: personal.id,
+                    nombre: personal.nombre,
+                    fecha: new Date().toISOString()
+                });
+                localStorage.setItem('accesosPersonal', JSON.stringify(accesos));
+
+                // Redirigir al panel
+                window.location.href = 'personal.html';
+            } else {
+                // Código inválido o usuario bloqueado
+                if (personal && personal.bloqueado) {
+                    errorText.textContent = 'Tu cuenta ha sido bloqueada. Contacta al administrador.';
+                } else if (personal && !personal.activo) {
+                    errorText.textContent = 'Tu cuenta está inactiva. Contacta al administrador.';
+                } else {
+                    errorText.textContent = 'Código de usuario inválido';
+                }
+                errorMessage.classList.add('show');
+
+                // Limpiar input
+                codigoInput.value = '';
+                codigoInput.focus();
+
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // Formatear código mientras se escribe
+        document.getElementById('codigo-usuario').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8);
+            }
+
+            e.target.value = value;
+        });
+
+        // Verificar si ya hay sesión activa
+        window.addEventListener('load', function () {
+            const sesion = JSON.parse(localStorage.getItem('sesionPersonal'));
+            if (sesion) {
+                // Ya hay sesión activa, redirigir
+                window.location.href = 'personal.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

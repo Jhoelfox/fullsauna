@@ -33,6 +33,9 @@ function inicializarAdmin() {
     // Configurar auto-hide del header (activado)
     configurarAutoHideHeader();
 
+    // Restaurar estados de secciones colapsadas
+    setTimeout(restaurarEstadosSecciones, 100);
+
     // Actualizar datos cada 30 segundos
     setInterval(actualizarDatos, 30000);
 }
@@ -48,6 +51,7 @@ function configurarEventListeners() {
     document.getElementById('modulo-config-form').addEventListener('submit', guardarConfiguracionModulo);
 
     // Formularios de caja
+    document.getElementById('ingreso-rapido-form').addEventListener('submit', registrarIngresoRapido);
     document.getElementById('saldo-inicial-form').addEventListener('submit', registrarSaldoInicial);
     document.getElementById('ingreso-form').addEventListener('submit', registrarIngreso);
     document.getElementById('retiro-form').addEventListener('submit', registrarRetiro);
@@ -96,6 +100,132 @@ function configurarEventListeners() {
             });
         }
     });
+}
+
+// Función para colapsar/expandir secciones
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const content = section.querySelector('.section-content');
+    const button = section.querySelector('.btn-collapse i');
+    
+    if (content.style.display === 'none') {
+        // Expandir
+        content.style.display = 'block';
+        button.classList.remove('fa-chevron-down');
+        button.classList.add('fa-chevron-up');
+        section.classList.remove('collapsed');
+        
+        // Guardar estado
+        localStorage.setItem(`section-${sectionId}`, 'expanded');
+    } else {
+        // Colapsar
+        content.style.display = 'none';
+        button.classList.remove('fa-chevron-up');
+        button.classList.add('fa-chevron-down');
+        section.classList.add('collapsed');
+        
+        // Guardar estado
+        localStorage.setItem(`section-${sectionId}`, 'collapsed');
+    }
+}
+
+// Función para restaurar estados de secciones
+function restaurarEstadosSecciones() {
+    const secciones = [
+        'modulos-admin',
+        'productos-admin',
+        'reservas-admin',
+        'ingresos',
+        'usuarios-admin',
+        'configuracion'
+    ];
+    
+    secciones.forEach(sectionId => {
+        const estado = localStorage.getItem(`section-${sectionId}`);
+        if (estado === 'collapsed') {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const content = section.querySelector('.section-content');
+                const button = section.querySelector('.btn-collapse i');
+                
+                if (content && button) {
+                    content.style.display = 'none';
+                    button.classList.remove('fa-chevron-up');
+                    button.classList.add('fa-chevron-down');
+                    section.classList.add('collapsed');
+                }
+            }
+        }
+    });
+}
+
+// Función para colapsar/expandir todas las secciones
+function toggleAllSections() {
+    const secciones = [
+        'modulos-admin',
+        'productos-admin',
+        'reservas-admin',
+        'ingresos',
+        'usuarios-admin',
+        'personal-admin',
+        'configuracion'
+    ];
+    
+    // Verificar si hay alguna sección expandida
+    let hayExpandidas = false;
+    secciones.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const content = section.querySelector('.section-content');
+            if (content && content.style.display !== 'none') {
+                hayExpandidas = true;
+            }
+        }
+    });
+    
+    // Si hay expandidas, colapsar todas. Si no, expandir todas
+    const accion = hayExpandidas ? 'collapse' : 'expand';
+    const btnToggleAll = document.getElementById('btn-toggle-all');
+    const iconToggleAll = btnToggleAll.querySelector('i');
+    
+    secciones.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const content = section.querySelector('.section-content');
+            const button = section.querySelector('.btn-collapse i');
+            
+            if (content && button) {
+                if (accion === 'collapse') {
+                    // Colapsar
+                    content.style.display = 'none';
+                    button.classList.remove('fa-chevron-up');
+                    button.classList.add('fa-chevron-down');
+                    section.classList.add('collapsed');
+                    localStorage.setItem(`section-${sectionId}`, 'collapsed');
+                } else {
+                    // Expandir
+                    content.style.display = 'block';
+                    button.classList.remove('fa-chevron-down');
+                    button.classList.add('fa-chevron-up');
+                    section.classList.remove('collapsed');
+                    localStorage.setItem(`section-${sectionId}`, 'expanded');
+                }
+            }
+        }
+    });
+    
+    // Cambiar icono del botón flotante
+    if (accion === 'collapse') {
+        iconToggleAll.classList.remove('fa-compress-alt');
+        iconToggleAll.classList.add('fa-expand-alt');
+        btnToggleAll.title = 'Expandir Todo';
+        mostrarToastAdmin('📦 Todas las secciones minimizadas', 'info');
+    } else {
+        iconToggleAll.classList.remove('fa-expand-alt');
+        iconToggleAll.classList.add('fa-compress-alt');
+        btnToggleAll.title = 'Minimizar Todo';
+        mostrarToastAdmin('📂 Todas las secciones expandidas', 'info');
+    }
 }
 
 function actualizarDatos() {
@@ -849,6 +979,54 @@ function cerrarModalRetiro() {
     document.body.classList.remove('modal-open');
 }
 
+// Función para ingreso rápido (formulario integrado)
+function registrarIngresoRapido(event) {
+    event.preventDefault();
+
+    const monto = parseFloat(document.getElementById('monto-rapido').value);
+    const concepto = document.getElementById('concepto-rapido').value;
+    const metodoPago = document.getElementById('metodo-rapido').value;
+    const descripcion = document.getElementById('descripcion-rapido').value;
+
+    const movimiento = {
+        id: Date.now(),
+        tipo: 'ingreso',
+        monto: monto,
+        concepto: concepto,
+        descripcion: descripcion || `Ingreso ${metodoPago}`,
+        metodoPago: metodoPago,
+        fecha: new Date().toISOString()
+    };
+
+    const historialCaja = JSON.parse(localStorage.getItem('historialCaja') || '[]');
+    historialCaja.push(movimiento);
+    localStorage.setItem('historialCaja', JSON.stringify(historialCaja));
+
+    // Actualizar balances separados
+    if (metodoPago === 'efectivo') {
+        let balanceEfectivo = parseFloat(localStorage.getItem('balanceEfectivo') || '0');
+        balanceEfectivo += monto;
+        localStorage.setItem('balanceEfectivo', balanceEfectivo.toString());
+    } else if (metodoPago === 'qr') {
+        let balanceQR = parseFloat(localStorage.getItem('balanceQR') || '0');
+        balanceQR += monto;
+        localStorage.setItem('balanceQR', balanceQR.toString());
+    }
+
+    // Actualizar balance total
+    let balanceCaja = parseFloat(localStorage.getItem('balanceCaja') || '0');
+    balanceCaja += monto;
+    localStorage.setItem('balanceCaja', balanceCaja.toString());
+
+    // Limpiar formulario
+    document.getElementById('ingreso-rapido-form').reset();
+    
+    // Recargar vista de caja
+    filtrarCajaAdmin();
+    
+    mostrarToastAdmin(`✅ Ingreso de ${monto} Bs registrado exitosamente`, 'success');
+}
+
 function registrarIngreso(event) {
     event.preventDefault();
 
@@ -862,6 +1040,7 @@ function registrarIngreso(event) {
         monto: monto,
         concepto: concepto,
         descripcion: descripcion,
+        metodoPago: 'efectivo',
         fecha: new Date().toISOString()
     };
 
@@ -869,8 +1048,19 @@ function registrarIngreso(event) {
     historialCaja.push(movimiento);
     localStorage.setItem('historialCaja', JSON.stringify(historialCaja));
 
+    // Actualizar balance de efectivo
+    let balanceEfectivo = parseFloat(localStorage.getItem('balanceEfectivo') || '0');
+    balanceEfectivo += monto;
+    localStorage.setItem('balanceEfectivo', balanceEfectivo.toString());
+
+    // Actualizar balance total
+    let balanceCaja = parseFloat(localStorage.getItem('balanceCaja') || '0');
+    balanceCaja += monto;
+    localStorage.setItem('balanceCaja', balanceCaja.toString());
+
     cerrarModalIngreso();
-    alert(`Ingreso de ${monto} Bs registrado exitosamente`);
+    filtrarCajaAdmin();
+    mostrarToastAdmin(`✅ Ingreso de ${monto} Bs registrado exitosamente`, 'success');
 }
 
 function registrarRetiro(event) {
@@ -2814,9 +3004,6 @@ function inicializarAdminConSolicitudes() {
         });
     }
 
-    // Agregar botón de prueba
-    setTimeout(agregarBotonPrueba, 1000);
-
     // Actualizar badge de solicitudes cada 30 segundos
     setInterval(actualizarEstadisticasSolicitudes, 30000);
 
@@ -2909,28 +3096,6 @@ function crearSolicitudesPrueba() {
     actualizarEstadisticasSolicitudes();
 
     alert('Se han creado 3 solicitudes de prueba para demostrar el funcionamiento del sistema.');
-}
-
-// Agregar botón de prueba al panel de configuración (solo para desarrollo)
-function agregarBotonPrueba() {
-    const configSection = document.getElementById('configuracion');
-    if (configSection && !document.getElementById('btn-prueba-solicitudes')) {
-        const configGrid = configSection.querySelector('.config-grid');
-        if (configGrid) {
-            const pruebaCard = document.createElement('div');
-            pruebaCard.className = 'config-card';
-            pruebaCard.innerHTML = `
-                <h3><i class="fas fa-flask"></i> Datos de Prueba</h3>
-                <p>Crear solicitudes de ejemplo para probar el sistema</p>
-                <div class="config-actions">
-                    <button id="btn-prueba-solicitudes" onclick="crearSolicitudesPrueba()" class="btn-info">
-                        <i class="fas fa-plus"></i> Crear Solicitudes de Prueba
-                    </button>
-                </div>
-            `;
-            configGrid.appendChild(pruebaCard);
-        }
-    }
 }
 
 // Función para mostrar formulario de nueva sauna
@@ -5244,3 +5409,716 @@ exportarUsuarios = function() {
 };
 
 console.log('📊 Sistema de exportación con períodos activado');
+
+
+// ==========================================
+// GESTIÓN DE PERSONAL
+// ==========================================
+
+let personalEditando = null;
+
+// Cargar personal al iniciar
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('personal-tbody')) {
+        cargarPersonalAdmin();
+        actualizarEstadisticasPersonal();
+    }
+});
+
+function cargarPersonalAdmin() {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const accesos = JSON.parse(localStorage.getItem('accesosPersonal')) || [];
+    const tbody = document.getElementById('personal-tbody');
+    
+    if (!tbody) return;
+    
+    if (personalRegistrado.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #7f8c8d;">No hay personal registrado</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = personalRegistrado.map(personal => {
+        // Buscar último acceso
+        const accesosPersonal = accesos.filter(a => a.personalId === personal.id);
+        const ultimoAcceso = accesosPersonal.length > 0 
+            ? new Date(accesosPersonal[accesosPersonal.length - 1].fecha).toLocaleString('es-ES')
+            : 'Nunca';
+        
+        const estadoBadge = personal.activo 
+            ? '<span class="badge-activo"><i class="fas fa-check-circle"></i> Activo</span>'
+            : '<span class="badge-inactivo"><i class="fas fa-times-circle"></i> Inactivo</span>';
+        
+        return `
+            <tr>
+                <td><code style="font-weight: 600; letter-spacing: 1px;">${personal.codigo}</code></td>
+                <td>${personal.nombre}</td>
+                <td>${personal.email}</td>
+                <td>${personal.telefono}</td>
+                <td>${new Date(personal.fechaRegistro).toLocaleDateString('es-ES')}</td>
+                <td>${ultimoAcceso}</td>
+                <td>${estadoBadge}</td>
+                <td>
+                    <button onclick="editarPersonal('${personal.id}')" class="btn-small btn-primary" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleEstadoPersonal('${personal.id}')" class="btn-small ${personal.activo ? 'btn-warning' : 'btn-success'}" title="${personal.activo ? 'Desactivar' : 'Activar'}">
+                        <i class="fas fa-${personal.activo ? 'ban' : 'check'}"></i>
+                    </button>
+                    <button onclick="reenviarCodigoPersonal('${personal.id}')" class="btn-small btn-secondary" title="Reenviar código">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    <button onclick="eliminarPersonal('${personal.id}')" class="btn-small btn-danger" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function actualizarEstadisticasPersonal() {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const accesos = JSON.parse(localStorage.getItem('accesosPersonal')) || [];
+    const hoy = new Date().toDateString();
+    
+    const totalPersonal = personalRegistrado.length;
+    const personalActivo = personalRegistrado.filter(p => p.activo).length;
+    const accesosHoy = accesos.filter(a => new Date(a.fecha).toDateString() === hoy).length;
+    
+    const totalEl = document.getElementById('total-personal');
+    const activoEl = document.getElementById('personal-activo');
+    const accesosEl = document.getElementById('accesos-hoy');
+    
+    if (totalEl) totalEl.textContent = totalPersonal;
+    if (activoEl) activoEl.textContent = personalActivo;
+    if (accesosEl) accesosEl.textContent = accesosHoy;
+}
+
+function mostrarFormularioNuevoPersonal() {
+    personalEditando = null;
+    document.getElementById('personal-modal-title').textContent = 'Agregar Personal';
+    document.getElementById('personal-form').reset();
+    document.getElementById('personal-codigo').value = '';
+    generarCodigoPersonal();
+    document.getElementById('personal-modal').style.display = 'block';
+}
+
+function editarPersonal(personalId) {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const personal = personalRegistrado.find(p => p.id === personalId);
+    
+    if (!personal) return;
+    
+    personalEditando = personal;
+    document.getElementById('personal-modal-title').textContent = 'Editar Personal';
+    document.getElementById('personal-nombre').value = personal.nombre;
+    document.getElementById('personal-email').value = personal.email;
+    document.getElementById('personal-telefono').value = personal.telefono;
+    document.getElementById('personal-codigo').value = personal.codigo;
+    document.getElementById('personal-modal').style.display = 'block';
+}
+
+function cerrarFormularioPersonal() {
+    document.getElementById('personal-modal').style.display = 'none';
+    personalEditando = null;
+}
+
+function generarCodigoPersonal() {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let codigo = '';
+    
+    for (let i = 0; i < 8; i++) {
+        if (i === 4) codigo += '-';
+        codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    
+    document.getElementById('personal-codigo').value = codigo;
+}
+
+document.getElementById('personal-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const nombre = document.getElementById('personal-nombre').value;
+    const email = document.getElementById('personal-email').value;
+    const telefono = document.getElementById('personal-telefono').value;
+    const codigo = document.getElementById('personal-codigo').value;
+    
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    
+    if (personalEditando) {
+        // Editar existente
+        const index = personalRegistrado.findIndex(p => p.id === personalEditando.id);
+        if (index !== -1) {
+            personalRegistrado[index] = {
+                ...personalRegistrado[index],
+                nombre,
+                email,
+                telefono,
+                codigo
+            };
+        }
+        mostrarNotificacion('Personal actualizado correctamente', 'success');
+    } else {
+        // Agregar nuevo
+        const nuevoPersonal = {
+            id: Date.now().toString(),
+            nombre,
+            email,
+            telefono,
+            codigo,
+            activo: true,
+            fechaRegistro: new Date().toISOString()
+        };
+        personalRegistrado.push(nuevoPersonal);
+        mostrarNotificacion('Personal agregado correctamente', 'success');
+        
+        // Simular envío de email
+        enviarCodigoEmail(nuevoPersonal);
+    }
+    
+    localStorage.setItem('personalRegistrado', JSON.stringify(personalRegistrado));
+    cerrarFormularioPersonal();
+    cargarPersonalAdmin();
+    actualizarEstadisticasPersonal();
+});
+
+function toggleEstadoPersonal(personalId) {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const index = personalRegistrado.findIndex(p => p.id === personalId);
+    
+    if (index !== -1) {
+        personalRegistrado[index].activo = !personalRegistrado[index].activo;
+        localStorage.setItem('personalRegistrado', JSON.stringify(personalRegistrado));
+        
+        const estado = personalRegistrado[index].activo ? 'activado' : 'desactivado';
+        mostrarNotificacion(`Personal ${estado} correctamente`, 'success');
+        
+        cargarPersonalAdmin();
+        actualizarEstadisticasPersonal();
+    }
+}
+
+function eliminarPersonal(personalId) {
+    if (!confirm('¿Estás seguro de eliminar este personal? Esta acción no se puede deshacer.')) return;
+    
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const nuevosPersonal = personalRegistrado.filter(p => p.id !== personalId);
+    
+    localStorage.setItem('personalRegistrado', JSON.stringify(nuevosPersonal));
+    mostrarNotificacion('Personal eliminado correctamente', 'success');
+    
+    cargarPersonalAdmin();
+    actualizarEstadisticasPersonal();
+}
+
+function reenviarCodigoPersonal(personalId) {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    const personal = personalRegistrado.find(p => p.id === personalId);
+    
+    if (personal) {
+        enviarCodigoEmail(personal);
+        mostrarNotificacion('Código reenviado al email del personal', 'success');
+    }
+}
+
+function enviarCodigoEmail(personal) {
+    // Simular envío de email (en producción, esto sería una llamada al backend)
+    console.log('📧 Enviando código por email...');
+    console.log('Para:', personal.email);
+    console.log('Código:', personal.codigo);
+    console.log('Nombre:', personal.nombre);
+    
+    // Mostrar modal con información del código
+    const mensaje = `
+        <div style="text-align: center; padding: 2rem;">
+            <i class="fas fa-envelope-open-text" style="font-size: 4rem; color: #27ae60; margin-bottom: 1rem;"></i>
+            <h3 style="margin-bottom: 1rem;">Código Generado</h3>
+            <p style="margin-bottom: 1.5rem;">El código de acceso para <strong>${personal.nombre}</strong> es:</p>
+            <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <code style="font-size: 2rem; font-weight: 700; letter-spacing: 3px; color: #27ae60;">${personal.codigo}</code>
+            </div>
+            <p style="color: #7f8c8d; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> 
+                En producción, este código se enviaría automáticamente al email: <strong>${personal.email}</strong>
+            </p>
+            <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 1rem;">
+                Por ahora, copia este código y envíalo manualmente al personal.
+            </p>
+        </div>
+    `;
+    
+    // Crear modal temporal
+    const modalTemp = document.createElement('div');
+    modalTemp.className = 'modal';
+    modalTemp.style.display = 'block';
+    modalTemp.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            ${mensaje}
+            <button onclick="this.closest('.modal').remove()" class="btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-check"></i> Entendido
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modalTemp);
+}
+
+function exportarPersonal() {
+    const personalRegistrado = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+    
+    if (personalRegistrado.length === 0) {
+        mostrarNotificacion('No hay personal para exportar', 'error');
+        return;
+    }
+    
+    let csv = 'Código,Nombre,Email,Teléfono,Estado,Fecha Registro\n';
+    
+    personalRegistrado.forEach(personal => {
+        csv += `${personal.codigo},${personal.nombre},${personal.email},${personal.telefono},${personal.activo ? 'Activo' : 'Inactivo'},${new Date(personal.fechaRegistro).toLocaleDateString('es-ES')}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `personal_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    
+    mostrarNotificacion('Personal exportado correctamente', 'success');
+}
+
+
+// ==========================================
+// SCROLL DE NAVEGACIÓN
+// ==========================================
+
+function scrollNav(direction) {
+    const nav = document.getElementById('admin-nav');
+    const scrollAmount = 200; // Cantidad de píxeles a desplazar
+    
+    if (direction === 'left') {
+        nav.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+        });
+    } else {
+        nav.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Detectar si hay scroll y mostrar/ocultar botones
+function checkNavScroll() {
+    const nav = document.getElementById('admin-nav');
+    const leftBtn = document.querySelector('.nav-scroll-left');
+    const rightBtn = document.querySelector('.nav-scroll-right');
+    
+    if (!nav || !leftBtn || !rightBtn) return;
+    
+    const hasScroll = nav.scrollWidth > nav.clientWidth;
+    
+    if (hasScroll) {
+        nav.classList.add('has-scroll');
+        
+        // Mostrar/ocultar botón izquierdo
+        if (nav.scrollLeft <= 0) {
+            leftBtn.classList.add('hidden');
+        } else {
+            leftBtn.classList.remove('hidden');
+        }
+        
+        // Mostrar/ocultar botón derecho
+        if (nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 1) {
+            rightBtn.classList.add('hidden');
+        } else {
+            rightBtn.classList.remove('hidden');
+        }
+    } else {
+        nav.classList.remove('has-scroll');
+        leftBtn.classList.add('hidden');
+        rightBtn.classList.add('hidden');
+    }
+}
+
+// Inicializar scroll de navegación
+document.addEventListener('DOMContentLoaded', function() {
+    const nav = document.getElementById('admin-nav');
+    
+    if (nav) {
+        // Verificar scroll al cargar
+        checkNavScroll();
+        
+        // Verificar scroll al hacer scroll
+        nav.addEventListener('scroll', checkNavScroll);
+        
+        // Verificar scroll al redimensionar ventana
+        window.addEventListener('resize', checkNavScroll);
+    }
+});
+
+// Scroll con rueda del mouse en la navegación
+document.getElementById('admin-nav')?.addEventListener('wheel', function(e) {
+    if (e.deltaY !== 0) {
+        e.preventDefault();
+        this.scrollLeft += e.deltaY;
+        checkNavScroll();
+    }
+});
+
+
+// ==========================================
+// GESTIÓN DE INFORMACIÓN DE CONTACTO
+// ==========================================
+
+// Cargar información de contacto al iniciar
+document.addEventListener('DOMContentLoaded', function() {
+    cargarVistaPreviewContacto();
+});
+
+function abrirEditorContacto() {
+    const contacto = JSON.parse(localStorage.getItem('infoContacto')) || obtenerContactoDefecto();
+    
+    // Llenar formulario con datos actuales
+    document.getElementById('telefono1').value = contacto.telefono1;
+    document.getElementById('telefono2').value = contacto.telefono2;
+    document.getElementById('ubicacion-nombre').value = contacto.ubicacionNombre;
+    document.getElementById('ubicacion-direccion').value = contacto.ubicacionDireccion;
+    document.getElementById('ubicacion-referencia').value = contacto.ubicacionReferencia || '';
+    document.getElementById('horario-dias').value = contacto.horarioDias;
+    document.getElementById('horario-inicio').value = contacto.horarioInicio;
+    document.getElementById('horario-fin').value = contacto.horarioFin;
+    document.getElementById('mapa-url').value = contacto.mapaUrl;
+    document.getElementById('whatsapp-mensaje').value = contacto.whatsappMensaje;
+    
+    document.getElementById('contacto-modal').style.display = 'block';
+}
+
+function cerrarModalContacto() {
+    document.getElementById('contacto-modal').style.display = 'none';
+}
+
+function guardarContacto(event) {
+    event.preventDefault();
+    
+    const contacto = {
+        telefono1: document.getElementById('telefono1').value,
+        telefono2: document.getElementById('telefono2').value,
+        ubicacionNombre: document.getElementById('ubicacion-nombre').value,
+        ubicacionDireccion: document.getElementById('ubicacion-direccion').value,
+        ubicacionReferencia: document.getElementById('ubicacion-referencia').value,
+        horarioDias: document.getElementById('horario-dias').value,
+        horarioInicio: document.getElementById('horario-inicio').value,
+        horarioFin: document.getElementById('horario-fin').value,
+        mapaUrl: document.getElementById('mapa-url').value,
+        whatsappMensaje: document.getElementById('whatsapp-mensaje').value
+    };
+    
+    localStorage.setItem('infoContacto', JSON.stringify(contacto));
+    
+    // Actualizar la página principal
+    actualizarContactoEnPagina(contacto);
+    
+    // Actualizar vista previa
+    cargarVistaPreviewContacto();
+    
+    mostrarNotificacion('Información de contacto actualizada correctamente', 'success');
+    cerrarModalContacto();
+}
+
+function obtenerContactoDefecto() {
+    return {
+        telefono1: '62975072',
+        telefono2: '72340226',
+        ubicacionNombre: 'Vida en Cristo DASS',
+        ubicacionDireccion: 'El Jordán, La Paz - Bolivia',
+        ubicacionReferencia: '',
+        horarioDias: 'Lunes a Domingo',
+        horarioInicio: '08:00',
+        horarioFin: '22:00',
+        mapaUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.3!2d-68.1193!3d-16.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDMwJzAwLjAiUyA2OMKwMDcnMDkuNSJX!5e0!3m2!1ses!2sbo!4v1699999999999!5m2!1ses!2sbo',
+        whatsappMensaje: 'Hola, quisiera información sobre el sauna'
+    };
+}
+
+function buscarEnGoogleMaps() {
+    const nombre = document.getElementById('ubicacion-nombre').value;
+    const direccion = document.getElementById('ubicacion-direccion').value;
+    
+    if (!nombre && !direccion) {
+        mostrarNotificacion('Ingresa al menos el nombre o la dirección para buscar', 'error');
+        return;
+    }
+    
+    const query = encodeURIComponent(`${nombre} ${direccion}`);
+    const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    
+    window.open(url, '_blank');
+    
+    // Mostrar ayuda para obtener el código
+    setTimeout(() => {
+        const ayuda = confirm('¿Necesitas ayuda para obtener el código del mapa?\n\nHaz clic en OK para ver las instrucciones.');
+        if (ayuda) {
+            abrirAyudaMapa();
+        }
+    }, 1000);
+}
+
+function cargarVistaPreviewContacto() {
+    const contacto = JSON.parse(localStorage.getItem('infoContacto')) || obtenerContactoDefecto();
+    
+    const preview1 = document.getElementById('preview-telefono1');
+    const preview2 = document.getElementById('preview-telefono2');
+    const previewUbicacion = document.getElementById('preview-ubicacion');
+    
+    if (preview1) preview1.textContent = contacto.telefono1;
+    if (preview2) preview2.textContent = contacto.telefono2;
+    if (previewUbicacion) previewUbicacion.textContent = `${contacto.ubicacionNombre}, ${contacto.ubicacionDireccion}`;
+}
+
+function actualizarContactoEnPagina(contacto) {
+    // Esta función actualiza el localStorage
+    // La página principal (index.html) debe leer estos datos al cargar
+    console.log('Información de contacto guardada:', contacto);
+    console.log('La página principal se actualizará al recargar');
+}
+
+function verVistaPrevia() {
+    window.open('index.html#contacto', '_blank');
+}
+
+function abrirAyudaMapa() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <h3><i class="fas fa-question-circle"></i> ¿Cómo obtener el código del mapa?</h3>
+            
+            <div style="margin-top: 1.5rem;">
+                <h4 style="color: #667eea; margin-bottom: 1rem;">Paso 1: Ir a Google Maps</h4>
+                <p style="margin-bottom: 1rem;">
+                    1. Abre <a href="https://www.google.com/maps" target="_blank" style="color: #667eea;">Google Maps</a><br>
+                    2. Busca tu ubicación: "Vida en Cristo DASS, El Jordán, La Paz"
+                </p>
+                
+                <h4 style="color: #667eea; margin-bottom: 1rem;">Paso 2: Compartir</h4>
+                <p style="margin-bottom: 1rem;">
+                    3. Haz clic en el botón "Compartir" <i class="fas fa-share-alt"></i><br>
+                    4. Selecciona la pestaña "Insertar un mapa"
+                </p>
+                
+                <h4 style="color: #667eea; margin-bottom: 1rem;">Paso 3: Copiar URL</h4>
+                <p style="margin-bottom: 1rem;">
+                    5. Verás un código HTML como:<br>
+                    <code style="background: #f5f5f5; padding: 0.5rem; display: block; margin: 0.5rem 0; border-radius: 4px; font-size: 0.85rem;">
+                        &lt;iframe src="https://www.google.com/maps/embed?pb=..."&gt;&lt;/iframe&gt;
+                    </code>
+                    6. Copia SOLO la URL que está dentro de <strong>src="..."</strong>
+                </p>
+                
+                <h4 style="color: #667eea; margin-bottom: 1rem;">Paso 4: Pegar</h4>
+                <p>
+                    7. Pega la URL en el campo "URL del Mapa"<br>
+                    8. Guarda los cambios
+                </p>
+                
+                <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; border-left: 4px solid #2196f3;">
+                    <p style="margin: 0; color: #1976d2;">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Tip:</strong> Asegúrate de copiar solo la URL, no todo el código HTML del iframe.
+                    </p>
+                </div>
+            </div>
+            
+            <button onclick="this.closest('.modal').remove()" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                <i class="fas fa-check"></i> Entendido
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+
+// ==========================================
+// GESTIÓN DE SESIÓN Y CREDENCIALES
+// ==========================================
+
+// Mostrar nombre de usuario en el header
+document.addEventListener('DOMContentLoaded', function() {
+    const sesion = localStorage.getItem('adminSession');
+    if (sesion) {
+        const sesionData = JSON.parse(sesion);
+        const usernameElement = document.getElementById('admin-username');
+        if (usernameElement) {
+            // Mostrar solo el primer nombre si es muy largo
+            const nombre = sesionData.username;
+            const nombreCorto = nombre.length > 20 ? nombre.split(' ')[0] : nombre;
+            usernameElement.textContent = nombreCorto;
+        }
+    }
+
+    // Actualizar preview de credenciales
+    actualizarPreviewCredenciales();
+});
+
+function cerrarSesion() {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        localStorage.removeItem('adminSession');
+        window.location.href = 'admin-login.html';
+    }
+}
+
+function abrirCambiarCredenciales() {
+    const credentials = JSON.parse(localStorage.getItem('adminCredentials'));
+    document.getElementById('nuevo-usuario').value = credentials.username;
+    document.getElementById('credenciales-modal').style.display = 'block';
+}
+
+function cerrarModalCredenciales() {
+    document.getElementById('credenciales-modal').style.display = 'none';
+    document.getElementById('form-credenciales').reset();
+}
+
+function guardarCredenciales(event) {
+    event.preventDefault();
+
+    const nuevoUsuario = document.getElementById('nuevo-usuario').value.trim();
+    const nuevaPassword = document.getElementById('nueva-password').value;
+    const confirmarPassword = document.getElementById('confirmar-password').value;
+    const passwordActual = document.getElementById('password-actual').value;
+
+    // Validar contraseña actual
+    const credentials = JSON.parse(localStorage.getItem('adminCredentials'));
+    if (passwordActual !== credentials.password) {
+        mostrarNotificacion('La contraseña actual es incorrecta', 'error');
+        return;
+    }
+
+    // Validar que las contraseñas coincidan
+    if (nuevaPassword !== confirmarPassword) {
+        mostrarNotificacion('Las contraseñas no coinciden', 'error');
+        return;
+    }
+
+    // Validar longitud mínima
+    if (nuevaPassword.length < 6) {
+        mostrarNotificacion('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+    }
+
+    // Confirmar cambio
+    if (!confirm('¿Estás seguro de cambiar tus credenciales?\n\nUsuario: ' + nuevoUsuario)) {
+        return;
+    }
+
+    // Guardar nuevas credenciales
+    const nuevasCredenciales = {
+        username: nuevoUsuario,
+        password: nuevaPassword
+    };
+    localStorage.setItem('adminCredentials', JSON.stringify(nuevasCredenciales));
+
+    // Actualizar sesión
+    const sesion = JSON.parse(localStorage.getItem('adminSession'));
+    sesion.username = nuevoUsuario;
+    localStorage.setItem('adminSession', JSON.stringify(sesion));
+
+    // Actualizar preview
+    actualizarPreviewCredenciales();
+
+    // Actualizar nombre en header
+    const usernameElement = document.getElementById('admin-username');
+    if (usernameElement) {
+        const nombreCorto = nuevoUsuario.length > 20 ? nuevoUsuario.split(' ')[0] : nuevoUsuario;
+        usernameElement.textContent = nombreCorto;
+    }
+
+    mostrarNotificacion('Credenciales actualizadas correctamente', 'success');
+    cerrarModalCredenciales();
+}
+
+function actualizarPreviewCredenciales() {
+    const credentials = JSON.parse(localStorage.getItem('adminCredentials'));
+    const previewUsername = document.getElementById('preview-username');
+    
+    if (previewUsername && credentials) {
+        const nombreCorto = credentials.username.length > 30 
+            ? credentials.username.substring(0, 30) + '...' 
+            : credentials.username;
+        previewUsername.textContent = nombreCorto;
+    }
+}
+
+function togglePasswordField(fieldId, iconId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(iconId);
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function verHistorialAccesos() {
+    const accesos = JSON.parse(localStorage.getItem('adminAccesos')) || [];
+    
+    if (accesos.length === 0) {
+        mostrarNotificacion('No hay historial de accesos registrado', 'info');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            <h3><i class="fas fa-history"></i> Historial de Accesos</h3>
+            
+            <div style="margin-top: 1.5rem;">
+                <p style="color: #7f8c8d; margin-bottom: 1rem;">
+                    Total de accesos: <strong>${accesos.length}</strong>
+                </p>
+                
+                <div style="max-height: 400px; overflow-y: auto;">
+                    ${accesos.reverse().map((acceso, index) => `
+                        <div style="background: ${index % 2 === 0 ? '#f8f9fa' : 'white'}; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${acceso.username}</strong>
+                                <div style="font-size: 0.85rem; color: #7f8c8d; margin-top: 0.25rem;">
+                                    <i class="fas fa-calendar"></i> ${new Date(acceso.fecha).toLocaleString('es-ES')}
+                                </div>
+                            </div>
+                            <div style="color: #27ae60;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <button onclick="limpiarHistorialAccesos(); this.closest('.modal').remove();" class="btn-danger" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-trash"></i> Limpiar Historial
+                </button>
+            </div>
+            
+            <button onclick="this.closest('.modal').remove()" class="btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-check"></i> Cerrar
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function limpiarHistorialAccesos() {
+    if (confirm('¿Estás seguro de limpiar el historial de accesos?')) {
+        localStorage.removeItem('adminAccesos');
+        mostrarNotificacion('Historial de accesos limpiado', 'success');
+    }
+}

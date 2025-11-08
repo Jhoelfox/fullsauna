@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Validación de Códigos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .section {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        input {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div style="text-align: right; margin-bottom: 1rem;">
+        <button onclick="window.location.href='admin.html'" style="background: #3498db; padding: 0.75rem 1.5rem; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            <i class="fas fa-arrow-left"></i> Volver al Panel Admin
+        </button>
+    </div>
+    <h1>🧪 Test de Validación de Códigos</h1>
+
+    <div class="section">
+        <h2>1️⃣ Generar Código</h2>
+        <button onclick="generarCodigo()">Generar 1 Código</button>
+        <div id="resultado-generar" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣ Ver Códigos Guardados</h2>
+        <button onclick="verCodigos()">Ver Códigos en LocalStorage</button>
+        <div id="resultado-ver" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>3️⃣ Validar Código</h2>
+        <input type="text" id="codigo-test" placeholder="XXXX-XXXX" maxlength="9">
+        <button onclick="validarCodigo()">Validar Código</button>
+        <div id="resultado-validar" class="result"></div>
+    </div>
+
+    <div class="section">
+        <h2>4️⃣ Limpiar Todo</h2>
+        <button onclick="limpiarTodo()" style="background: #e74c3c;">Limpiar LocalStorage</button>
+    </div>
+
+    <script>
+        // Función para generar código único
+        function generarCodigoUnico() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let codigo = '';
+            for (let i = 0; i < 8; i++) {
+                if (i === 4) codigo += '-';
+                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return codigo;
+        }
+
+        // Generar código
+        function generarCodigo() {
+            const codigo = generarCodigoUnico();
+            const codigosDisponibles = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            
+            const nuevoCodigo = {
+                codigo: codigo,
+                fechaGeneracion: new Date().toISOString(),
+                usado: false,
+                fechaUso: null
+            };
+            
+            codigosDisponibles.push(nuevoCodigo);
+            localStorage.setItem('codigosAccesoDisponibles', JSON.stringify(codigosDisponibles));
+            
+            document.getElementById('resultado-generar').innerHTML = `
+<span class="success">✅ Código generado exitosamente!</span>
+
+Código: ${codigo}
+Total de códigos: ${codigosDisponibles.length}
+
+Guardado en: localStorage.codigosAccesoDisponibles
+            `;
+            
+            document.getElementById('codigo-test').value = codigo;
+        }
+
+        // Ver códigos
+        function verCodigos() {
+            const codigosDisponibles = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            
+            if (codigosDisponibles.length === 0) {
+                document.getElementById('resultado-ver').innerHTML = `
+<span class="error">❌ No hay códigos guardados</span>
+
+Genera un código primero usando el botón de arriba.
+                `;
+                return;
+            }
+            
+            let html = `<span class="success">✅ Códigos encontrados: ${codigosDisponibles.length}</span>\n\n`;
+            
+            codigosDisponibles.forEach((c, i) => {
+                html += `${i + 1}. ${c.codigo} - ${c.usado ? '❌ USADO' : '✅ DISPONIBLE'}\n`;
+            });
+            
+            document.getElementById('resultado-ver').innerHTML = html;
+        }
+
+        // Validar código
+        function validarCodigo() {
+            const codigo = document.getElementById('codigo-test').value.trim().toUpperCase();
+            
+            if (!codigo) {
+                document.getElementById('resultado-validar').innerHTML = `
+<span class="error">❌ Ingresa un código</span>
+                `;
+                return;
+            }
+            
+            const codigosDisponibles = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            console.log('Códigos disponibles:', codigosDisponibles);
+            console.log('Código a validar:', codigo);
+            
+            const codigoEncontrado = codigosDisponibles.find(c => c.codigo === codigo);
+            
+            if (!codigoEncontrado) {
+                document.getElementById('resultado-validar').innerHTML = `
+<span class="error">❌ Código NO encontrado</span>
+
+El código "${codigo}" no existe en la base de datos.
+                `;
+                return;
+            }
+            
+            if (codigoEncontrado.usado) {
+                document.getElementById('resultado-validar').innerHTML = `
+<span class="error">❌ Código YA USADO</span>
+
+El código "${codigo}" ya fue utilizado.
+Fecha de uso: ${new Date(codigoEncontrado.fechaUso).toLocaleString()}
+                `;
+                return;
+            }
+            
+            document.getElementById('resultado-validar').innerHTML = `
+<span class="success">✅ Código VÁLIDO</span>
+
+El código "${codigo}" está disponible para usar.
+Fecha de generación: ${new Date(codigoEncontrado.fechaGeneracion).toLocaleString()}
+            `;
+        }
+
+        // Limpiar todo
+        function limpiarTodo() {
+            if (confirm('¿Estás seguro de limpiar todos los códigos?')) {
+                localStorage.removeItem('codigosAccesoDisponibles');
+                document.getElementById('resultado-generar').innerHTML = '';
+                document.getElementById('resultado-ver').innerHTML = '<span class="success">✅ LocalStorage limpiado</span>';
+                document.getElementById('resultado-validar').innerHTML = '';
+                document.getElementById('codigo-test').value = '';
+            }
+        }
+
+        // Auto-formatear código
+        document.getElementById('codigo-test').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8);
+            }
+            e.target.value = value;
+        });
+
+        // Cargar códigos al inicio
+        window.addEventListener('load', verCodigos);
+    </script>
+</body>
+</html>

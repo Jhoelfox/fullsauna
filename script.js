@@ -1615,64 +1615,11 @@ function pagarQR() {
     const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
     document.getElementById('total-qr').textContent = `${total} Bs`;
-    
-    // Generar código QR real
-    generarCodigoQR(total);
 
     cerrarCarrito();
     const qrModal = document.getElementById('qr-modal');
     qrModal.classList.add('show');
     qrModal.style.display = 'flex';
-}
-
-// Función para generar código QR real
-function generarCodigoQR(monto) {
-    const qrContainer = document.getElementById('qr-code');
-    const qrImage = document.getElementById('qr-image');
-    const placeholder = qrContainer.querySelector('.qr-placeholder');
-    
-    // Datos para el QR (puedes personalizarlos)
-    const datosPago = {
-        banco: 'Banco Nacional de Bolivia',
-        titular: 'Sauna C y G',
-        nit: '123456789',
-        monto: monto,
-        moneda: 'BOB',
-        concepto: 'Pago Sauna C y G'
-    };
-    
-    // Crear texto para el QR
-    const textoQR = `Banco: ${datosPago.banco}\nTitular: ${datosPago.titular}\nNIT: ${datosPago.nit}\nMonto: ${datosPago.monto} ${datosPago.moneda}\nConcepto: ${datosPago.concepto}`;
-    
-    // Usar API de QR Code Generator (gratuita)
-    // Opción 1: API de goqr.me
-    const urlQR = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(textoQR)}`;
-    
-    // Opción 2: Puedes usar tu propia imagen QR
-    // const urlQR = 'ruta/a/tu/imagen-qr.png';
-    
-    // Mostrar placeholder mientras carga
-    if (placeholder) {
-        placeholder.style.display = 'block';
-    }
-    
-    // Cargar imagen QR
-    qrImage.onload = function() {
-        if (placeholder) {
-            placeholder.style.display = 'none';
-        }
-        qrImage.style.display = 'block';
-    };
-    
-    qrImage.onerror = function() {
-        // Si falla, mostrar QR de respaldo
-        if (placeholder) {
-            placeholder.innerHTML = '<i class="fas fa-qrcode"></i><p>Código QR disponible</p>';
-        }
-        mostrarToast('Código QR generado', 'info');
-    };
-    
-    qrImage.src = urlQR;
 }
 
 // Función para cerrar modal QR

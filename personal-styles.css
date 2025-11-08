@@ -1,0 +1,537 @@
+/* Estilos específicos para el panel de Personal Administrativo */
+
+/* Ajustes al header para personal */
+.logo-icon {
+    background: linear-gradient(135deg, #27ae60, #229954);
+}
+
+/* Resumen de Ventas */
+.ventas-resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.resumen-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.resumen-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.resumen-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.resumen-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.resumen-label {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin-bottom: 0.25rem;
+}
+
+.resumen-amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Formulario de Venta Rápida */
+.venta-rapida-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.venta-rapida-form h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-row-ventas {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.form-field-venta {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field-venta label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--gray-700);
+    font-size: 0.9rem;
+}
+
+.form-field-venta input,
+.form-field-venta select {
+    padding: 0.75rem;
+    border: 2px solid var(--gray-300);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-field-venta input:focus,
+.form-field-venta select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-field-venta input[readonly] {
+    background-color: var(--gray-100);
+    cursor: not-allowed;
+}
+
+.form-field-btn-venta {
+    display: flex;
+    align-items: flex-end;
+}
+
+.form-field-btn-venta button {
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+}
+
+/* Historial de Ventas */
+.ventas-historial {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ventas-historial h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ventas-lista {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.venta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+    transition: background-color 0.3s ease;
+}
+
+.venta-item:hover {
+    background-color: var(--gray-50);
+}
+
+.venta-item:last-child {
+    border-bottom: none;
+}
+
+.venta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.venta-producto {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.venta-detalles {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+}
+
+.venta-monto {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--success-color);
+}
+
+.venta-metodo {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.venta-metodo.efectivo {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.venta-metodo.qr {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Grid de Productos para Personal */
+.productos-personal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.producto-card-personal {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.producto-card-personal:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.producto-imagen-personal {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: var(--gray-200);
+}
+
+.producto-info-personal {
+    padding: 1rem;
+}
+
+.producto-nombre-personal {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.producto-precio-personal {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.producto-stock-personal {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+}
+
+.stock-bajo {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.stock-agotado {
+    color: var(--danger-color);
+    font-weight: 700;
+    background-color: #f8d7da;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* Mensaje de lista vacía */
+.lista-vacia {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray-500);
+}
+
+.lista-vacia i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .form-row-ventas {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-field-btn-venta {
+        grid-column: 1 / -1;
+    }
+    
+    .form-field-btn-venta button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row-ventas {
+        grid-template-columns: 1fr;
+    }
+    
+    .ventas-resumen {
+        grid-template-columns: 1fr;
+    }
+    
+    .productos-personal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+/* Animación de éxito */
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.venta-registrada {
+    animation: successPulse 0.5s ease;
+}
+
+
+/* Tabs para tipo de venta */
+.ventas-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.venta-tab-btn {
+    flex: 1;
+    padding: 1rem;
+    background: white;
+    border: 2px solid var(--gray-300);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.venta-tab-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-50);
+}
+
+.venta-tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.venta-tab-btn i {
+    font-size: 1.2rem;
+}
+
+/* Ajustes para productos con controles de stock */
+.producto-card-admin {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.producto-card-admin:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.producto-imagen-admin {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: var(--gray-200);
+}
+
+.producto-info-admin {
+    padding: 1rem;
+}
+
+.producto-nombre-admin {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.producto-categoria-admin {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: var(--gray-100);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.producto-precio-admin {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+}
+
+.producto-stock-admin {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background: var(--gray-50);
+    border-radius: 6px;
+}
+
+.stock-label {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+}
+
+.stock-valor {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--gray-800);
+}
+
+.stock-controles {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.btn-stock {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.btn-stock-menos {
+    background: #fee;
+    color: #c00;
+}
+
+.btn-stock-menos:hover {
+    background: #fcc;
+}
+
+.btn-stock-mas {
+    background: #efe;
+    color: #0a0;
+}
+
+.btn-stock-mas:hover {
+    background: #cfc;
+}
+
+.producto-actions-admin {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-editar-producto,
+.btn-eliminar-producto {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-editar-producto {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-editar-producto:hover {
+    background: var(--secondary-color);
+}
+
+.btn-eliminar-producto {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-eliminar-producto:hover {
+    background: #c0392b;
+}
+
+
+/* Asegurar que el span esté en la parte superior */
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.logo-text span {
+    order: 1;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.logo-text h1 {
+    order: 2;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .logo-text span {
+        font-size: 0.75rem;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.3rem;
+    }
+}

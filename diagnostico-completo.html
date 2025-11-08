@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Completo del Sistema</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+        .section {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        button.success { background: #27ae60; }
+        button.success:hover { background: #229954; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        input {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            min-width: 200px;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+        .badge.success { background: #d4edda; color: #155724; }
+        .badge.error { background: #f8d7da; color: #721c24; }
+        .badge.warning { background: #fff3cd; color: #856404; }
+        .badge.info { background: #d1ecf1; color: #0c5460; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .card p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: right; margin-bottom: 1rem;">
+            <button onclick="window.location.href='admin.html'" style="background: #3498db;">
+                <i class="fas fa-arrow-left"></i> Volver al Panel Admin
+            </button>
+        </div>
+        <h1>🔍 Diagnóstico Completo del Sistema</h1>
+
+        <!-- SECCIÓN 1: ESTADO ACTUAL -->
+        <div class="section">
+            <h2>📊 Estado Actual del Sistema</h2>
+            <button onclick="verificarEstado()">Verificar Estado</button>
+            <div id="estado-sistema" class="result"></div>
+        </div>
+
+        <!-- SECCIÓN 2: GENERAR CÓDIGOS -->
+        <div class="section">
+            <h2>🔑 Generar Códigos de Acceso</h2>
+            <input type="number" id="cantidad" value="1" min="1" max="10">
+            <button class="success" onclick="generarCodigos()">Generar Códigos</button>
+            <div id="resultado-generar" class="result"></div>
+        </div>
+
+        <!-- SECCIÓN 3: REGISTRAR PERSONAL -->
+        <div class="section">
+            <h2>👤 Registrar Personal con Código</h2>
+            <input type="text" id="codigo-registro" placeholder="XXXX-XXXX" maxlength="9">
+            <input type="text" id="nombre-registro" placeholder="Nombre completo">
+            <button class="success" onclick="registrarPersonal()">Registrar Personal</button>
+            <div id="resultado-registro" class="result"></div>
+        </div>
+
+        <!-- SECCIÓN 4: PROBAR LOGIN -->
+        <div class="section">
+            <h2>🔐 Probar Login</h2>
+            <input type="text" id="codigo-login" placeholder="XXXX-XXXX" maxlength="9">
+            <button onclick="probarLogin()">Probar Login</button>
+            <div id="resultado-login" class="result"></div>
+        </div>
+
+        <!-- SECCIÓN 5: VER DATOS -->
+        <div class="section">
+            <h2>📋 Ver Datos Guardados</h2>
+            <button onclick="verCodigos()">Ver Códigos</button>
+            <button onclick="verPersonal()">Ver Personal</button>
+            <button onclick="verSesiones()">Ver Sesiones</button>
+            <div id="resultado-datos" class="result"></div>
+        </div>
+
+        <!-- SECCIÓN 6: LIMPIAR -->
+        <div class="section">
+            <h2>🗑️ Limpiar Datos</h2>
+            <button class="danger" onclick="limpiarCodigos()">Limpiar Códigos</button>
+            <button class="danger" onclick="limpiarPersonal()">Limpiar Personal</button>
+            <button class="danger" onclick="limpiarTodo()">Limpiar Todo</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para generar código único
+        function generarCodigoUnico() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let codigo = '';
+            for (let i = 0; i < 8; i++) {
+                if (i === 4) codigo += '-';
+                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return codigo;
+        }
+
+        // Verificar estado del sistema
+        function verificarEstado() {
+            const codigos = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            const personal = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            const sesiones = JSON.parse(localStorage.getItem('sesionPersonal'));
+
+            const codigosDisponibles = codigos.filter(c => !c.usado).length;
+            const codigosUsados = codigos.filter(c => c.usado).length;
+
+            let html = `
+╔════════════════════════════════════════╗
+║     ESTADO DEL SISTEMA                 ║
+╚════════════════════════════════════════╝
+
+📊 CÓDIGOS DE ACCESO:
+   Total: ${codigos.length}
+   Disponibles: ${codigosDisponibles}
+   Usados: ${codigosUsados}
+
+👥 PERSONAL REGISTRADO:
+   Total: ${personal.length}
+   Activos: ${personal.filter(p => p.activo).length}
+   Bloqueados: ${personal.filter(p => p.bloqueado).length}
+
+🔐 SESIÓN ACTUAL:
+   ${sesiones ? '✅ Hay sesión activa' : '❌ No hay sesión activa'}
+   ${sesiones ? `Usuario: ${sesiones.nombre}` : ''}
+
+${codigos.length === 0 ? '\n⚠️ NO HAY CÓDIGOS GENERADOS\n   Genera códigos primero' : ''}
+${personal.length === 0 ? '\n⚠️ NO HAY PERSONAL REGISTRADO\n   Registra personal con un código' : ''}
+            `;
+
+            document.getElementById('estado-sistema').innerHTML = html;
+        }
+
+        // Generar códigos
+        function generarCodigos() {
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+            const codigos = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            const nuevosCodigos = [];
+
+            for (let i = 0; i < cantidad; i++) {
+                const codigo = generarCodigoUnico();
+                codigos.push({
+                    codigo: codigo,
+                    fechaGeneracion: new Date().toISOString(),
+                    usado: false,
+                    fechaUso: null
+                });
+                nuevosCodigos.push(codigo);
+            }
+
+            localStorage.setItem('codigosAccesoDisponibles', JSON.stringify(codigos));
+
+            let html = `✅ ${cantidad} código(s) generado(s) exitosamente!\n\n`;
+            nuevosCodigos.forEach((c, i) => {
+                html += `${i + 1}. ${c}\n`;
+            });
+            html += `\nTotal de códigos: ${codigos.length}`;
+
+            document.getElementById('resultado-generar').innerHTML = html;
+            document.getElementById('codigo-registro').value = nuevosCodigos[0];
+            document.getElementById('codigo-login').value = nuevosCodigos[0];
+            verificarEstado();
+        }
+
+        // Registrar personal
+        function registrarPersonal() {
+            const codigo = document.getElementById('codigo-registro').value.trim().toUpperCase();
+            const nombre = document.getElementById('nombre-registro').value.trim();
+
+            if (!codigo || !nombre) {
+                document.getElementById('resultado-registro').innerHTML = '❌ Completa todos los campos';
+                return;
+            }
+
+            // Verificar código
+            const codigos = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            const codigoValido = codigos.find(c => c.codigo === codigo && !c.usado);
+
+            if (!codigoValido) {
+                document.getElementById('resultado-registro').innerHTML = `❌ Código inválido o ya usado\n\nCódigo: ${codigo}`;
+                return;
+            }
+
+            // Marcar código como usado
+            const index = codigos.findIndex(c => c.codigo === codigo);
+            codigos[index].usado = true;
+            codigos[index].fechaUso = new Date().toISOString();
+            localStorage.setItem('codigosAccesoDisponibles', JSON.stringify(codigos));
+
+            // Crear personal
+            const personal = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            const nuevoPersonal = {
+                id: Date.now().toString(),
+                nombre: nombre,
+                ci: '12345678',
+                email: 'test@test.com',
+                telefono: '71234567',
+                codigo: codigo,
+                activo: true,
+                bloqueado: false,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            personal.push(nuevoPersonal);
+            localStorage.setItem('personalRegistrado', JSON.stringify(personal));
+
+            document.getElementById('resultado-registro').innerHTML = `
+✅ Personal registrado exitosamente!
+
+Nombre: ${nombre}
+Código: ${codigo}
+ID: ${nuevoPersonal.id}
+
+Ahora puedes usar este código para hacer login.
+            `;
+
+            document.getElementById('codigo-login').value = codigo;
+            verificarEstado();
+        }
+
+        // Probar login
+        function probarLogin() {
+            const codigo = document.getElementById('codigo-login').value.trim().toUpperCase();
+
+            if (!codigo) {
+                document.getElementById('resultado-login').innerHTML = '❌ Ingresa un código';
+                return;
+            }
+
+            const personal = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            const usuario = personal.find(p => p.codigo === codigo);
+
+            if (!usuario) {
+                document.getElementById('resultado-login').innerHTML = `
+❌ Código no encontrado en personal registrado
+
+Código buscado: ${codigo}
+Personal registrado: ${personal.length}
+
+${personal.length > 0 ? 'Códigos disponibles:\n' + personal.map(p => `- ${p.codigo} (${p.nombre})`).join('\n') : 'No hay personal registrado'}
+                `;
+                return;
+            }
+
+            if (usuario.bloqueado) {
+                document.getElementById('resultado-login').innerHTML = '❌ Usuario bloqueado';
+                return;
+            }
+
+            if (!usuario.activo) {
+                document.getElementById('resultado-login').innerHTML = '❌ Usuario inactivo';
+                return;
+            }
+
+            // Crear sesión
+            const sesion = {
+                personalId: usuario.id,
+                nombre: usuario.nombre,
+                codigo: usuario.codigo,
+                fechaIngreso: new Date().toISOString()
+            };
+            localStorage.setItem('sesionPersonal', JSON.stringify(sesion));
+
+            document.getElementById('resultado-login').innerHTML = `
+✅ LOGIN EXITOSO!
+
+Nombre: ${usuario.nombre}
+Código: ${usuario.codigo}
+ID: ${usuario.id}
+
+Sesión creada correctamente.
+Puedes ir a personal.html
+            `;
+
+            verificarEstado();
+        }
+
+        // Ver códigos
+        function verCodigos() {
+            const codigos = JSON.parse(localStorage.getItem('codigosAccesoDisponibles')) || [];
+            
+            if (codigos.length === 0) {
+                document.getElementById('resultado-datos').innerHTML = '❌ No hay códigos generados';
+                return;
+            }
+
+            let html = `📋 CÓDIGOS GENERADOS (${codigos.length}):\n\n`;
+            codigos.forEach((c, i) => {
+                html += `${i + 1}. ${c.codigo} - ${c.usado ? '❌ USADO' : '✅ DISPONIBLE'}\n`;
+            });
+
+            document.getElementById('resultado-datos').innerHTML = html;
+        }
+
+        // Ver personal
+        function verPersonal() {
+            const personal = JSON.parse(localStorage.getItem('personalRegistrado')) || [];
+            
+            if (personal.length === 0) {
+                document.getElementById('resultado-datos').innerHTML = '❌ No hay personal registrado';
+                return;
+            }
+
+            let html = `👥 PERSONAL REGISTRADO (${personal.length}):\n\n`;
+            personal.forEach((p, i) => {
+                html += `${i + 1}. ${p.nombre}\n`;
+                html += `   Código: ${p.codigo}\n`;
+                html += `   Estado: ${p.activo ? '✅ Activo' : '❌ Inactivo'}\n`;
+                html += `   ${p.bloqueado ? '🔒 Bloqueado' : ''}\n\n`;
+            });
+
+            document.getElementById('resultado-datos').innerHTML = html;
+        }
+
+        // Ver sesiones
+        function verSesiones() {
+            const sesion = JSON.parse(localStorage.getItem('sesionPersonal'));
+            
+            if (!sesion) {
+                document.getElementById('resultado-datos').innerHTML = '❌ No hay sesión activa';
+                return;
+            }
+
+            let html = `🔐 SESIÓN ACTIVA:\n\n`;
+            html += `Nombre: ${sesion.nombre}\n`;
+            html += `Código: ${sesion.codigo}\n`;
+            html += `ID: ${sesion.personalId}\n`;
+            html += `Fecha: ${new Date(sesion.fechaIngreso).toLocaleString()}\n`;
+
+            document.getElementById('resultado-datos').innerHTML = html;
+        }
+
+        // Limpiar funciones
+        function limpiarCodigos() {
+            if (confirm('¿Limpiar todos los códigos?')) {
+                localStorage.removeItem('codigosAccesoDisponibles');
+                alert('✅ Códigos eliminados');
+                verificarEstado();
+            }
+        }
+
+        function limpiarPersonal() {
+            if (confirm('¿Limpiar todo el personal?')) {
+                localStorage.removeItem('personalRegistrado');
+                localStorage.removeItem('sesionPersonal');
+                alert('✅ Personal eliminado');
+                verificarEstado();
+            }
+        }
+
+        function limpiarTodo() {
+            if (confirm('¿Limpiar TODOS los datos del sistema?')) {
+                localStorage.clear();
+                alert('✅ Sistema limpiado completamente');
+                verificarEstado();
+            }
+        }
+
+        // Auto-formatear códigos
+        document.getElementById('codigo-registro').addEventListener('input', formatearCodigo);
+        document.getElementById('codigo-login').addEventListener('input', formatearCodigo);
+
+        function formatearCodigo(e) {
+            let value = e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4, 8);
+            }
+            e.target.value = value;
+        }
+
+        // Cargar estado al inicio
+        window.addEventListener('load', verificarEstado);
+    </script>
+</body>
+</html>

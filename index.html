@@ -362,12 +362,8 @@
                     </div>
 
                     <div class="qr-code-display" id="qr-code">
-                        <!-- La imagen QR se cargará aquí -->
-                        <img id="qr-image" src="" alt="Código QR" style="display: none;">
-                        <div class="qr-placeholder">
-                            <i class="fas fa-qrcode"></i>
-                            <p>Generando código QR...</p>
-                        </div>
+                        <!-- Imagen QR fija -->
+                        <img src="QR.jpg" alt="Código QR de Pago" class="qr-image-fixed">
                     </div>
 
                     <div class="qr-datos-pago">
@@ -757,7 +753,182 @@
         </div>
     </div>
 
+    <!-- Sección de Contacto y Ubicación -->
+    <section class="contacto-ubicacion" id="contacto">
+        <div class="contacto-container">
+            <div class="contacto-header">
+                <h2><i class="fas fa-map-marker-alt"></i> Encuéntranos</h2>
+                <p>Visítanos en nuestra ubicación o contáctanos</p>
+            </div>
+
+            <div class="contacto-grid">
+                <!-- Información de Contacto -->
+                <div class="contacto-info">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Teléfonos</h3>
+                            <a href="tel:+59162975072" class="contacto-link">
+                                <i class="fab fa-whatsapp"></i> 62975072
+                            </a>
+                            <a href="tel:+59172340226" class="contacto-link">
+                                <i class="fab fa-whatsapp"></i> 72340226
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Ubicación</h3>
+                            <p>Vida en Cristo DASS</p>
+                            <p>El Jordán, La Paz - Bolivia</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Horarios</h3>
+                            <p><strong>Lunes a Domingo</strong></p>
+                            <p>8:00 AM - 10:00 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="contacto-acciones">
+                        <a href="https://wa.me/59162975072?text=Hola,%20quisiera%20información%20sobre%20el%20sauna"
+                            target="_blank" class="btn-whatsapp">
+                            <i class="fab fa-whatsapp"></i> Chatear por WhatsApp
+                        </a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Vida+en+Cristo+DASS+El+Jordan+La+Paz"
+                            target="_blank" class="btn-direcciones">
+                            <i class="fas fa-directions"></i> Cómo Llegar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mapa -->
+                <div class="contacto-mapa">
+                    <div class="mapa-container">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.3!2d-68.1193!3d-16.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDMwJzAwLjAiUyA2OMKwMDcnMDkuNSJX!5e0!3m2!1ses!2sbo!4v1699999999999!5m2!1ses!2sbo"
+                            width="100%" height="100%" style="border:0; border-radius: 12px;" allowfullscreen=""
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                    <div class="mapa-overlay">
+                        <div class="mapa-badge">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Sauna C y G</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3><i class="fas fa-spa"></i> Sauna C y G</h3>
+                    <p>Tu espacio de relajación en El Jordán</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#contacto"><i class="fas fa-map-marker-alt"></i> Ubicación</a>
+                    <a href="tel:+59162975072"><i class="fas fa-phone"></i> Contacto</a>
+                    <a href="admin.html"><i class="fas fa-user-shield"></i> Admin</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Sauna C y G - El Jordán. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
+    <script>
+        // Cargar información de contacto desde localStorage
+        document.addEventListener('DOMContentLoaded', function () {
+            const contactoGuardado = localStorage.getItem('infoContacto');
+
+            if (contactoGuardado) {
+                const contacto = JSON.parse(contactoGuardado);
+                actualizarInformacionContacto(contacto);
+            }
+        });
+
+        function actualizarInformacionContacto(contacto) {
+            // Actualizar teléfonos
+            const telefonos = document.querySelectorAll('.contacto-link');
+            if (telefonos[0]) {
+                telefonos[0].href = `tel:+591${contacto.telefono1}`;
+                telefonos[0].innerHTML = `<i class="fab fa-whatsapp"></i> ${contacto.telefono1}`;
+            }
+            if (telefonos[1]) {
+                telefonos[1].href = `tel:+591${contacto.telefono2}`;
+                telefonos[1].innerHTML = `<i class="fab fa-whatsapp"></i> ${contacto.telefono2}`;
+            }
+
+            // Actualizar ubicación
+            const ubicacionTextos = document.querySelectorAll('.info-content p');
+            if (ubicacionTextos.length >= 2) {
+                ubicacionTextos[0].textContent = contacto.ubicacionNombre;
+                ubicacionTextos[1].textContent = contacto.ubicacionDireccion;
+
+                // Agregar referencias si existen
+                if (contacto.ubicacionReferencia) {
+                    const infoContent = ubicacionTextos[1].parentElement;
+                    let referenciaP = infoContent.querySelector('.ubicacion-referencia');
+                    if (!referenciaP) {
+                        referenciaP = document.createElement('p');
+                        referenciaP.className = 'ubicacion-referencia';
+                        referenciaP.style.color = '#95a5a6';
+                        referenciaP.style.fontSize = '0.9rem';
+                        referenciaP.style.fontStyle = 'italic';
+                        infoContent.appendChild(referenciaP);
+                    }
+                    referenciaP.innerHTML = `<i class="fas fa-info-circle"></i> ${contacto.ubicacionReferencia}`;
+                }
+            }
+
+            // Actualizar horarios
+            const horarioTextos = document.querySelectorAll('.info-content p');
+            if (horarioTextos.length >= 4) {
+                horarioTextos[2].innerHTML = `<strong>${contacto.horarioDias}</strong>`;
+                const horaInicio = contacto.horarioInicio.substring(0, 5);
+                const horaFin = contacto.horarioFin.substring(0, 5);
+                horarioTextos[3].textContent = `${horaInicio} - ${horaFin}`;
+            }
+
+            // Actualizar botón de WhatsApp
+            const btnWhatsapp = document.querySelector('.btn-whatsapp');
+            if (btnWhatsapp) {
+                const mensaje = encodeURIComponent(contacto.whatsappMensaje);
+                btnWhatsapp.href = `https://wa.me/591${contacto.telefono1}?text=${mensaje}`;
+            }
+
+            // Actualizar mapa
+            const mapaIframe = document.querySelector('.mapa-container iframe');
+            if (mapaIframe && contacto.mapaUrl) {
+                mapaIframe.src = contacto.mapaUrl;
+            }
+
+            // Actualizar botón de direcciones
+            const btnDirecciones = document.querySelector('.btn-direcciones');
+            if (btnDirecciones) {
+                const query = encodeURIComponent(`${contacto.ubicacionNombre} ${contacto.ubicacionDireccion}`);
+                btnDirecciones.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+            }
+        }
+    </script>
 </body>
 
 </html>

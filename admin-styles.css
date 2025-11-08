@@ -97,10 +97,10 @@ body {
 
 /* Header Admin */
 .admin-header {
-    background: rgba(255, 255, 255, 0.98);
+    background: #ffffff;
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #e0e0e0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
     left: 0;
@@ -109,6 +109,7 @@ body {
     z-index: 99999;
     transition: none;
     margin: 0;
+    padding: 0;
 }
 
 /* Header siempre visible en el tope */
@@ -119,15 +120,16 @@ body {
 
 /* Compensar el espacio del header fijo */
 .main-content {
-    padding-top: 100px;
+    padding-top: 140px;
     margin-top: 0;
 }
 
 .admin-header .container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 20px;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem 20px;
+    margin: 0;
 }
 
 .logo-section {
@@ -175,6 +177,32 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--admin-primary) transparent;
+    padding-bottom: 0.5rem;
+}
+
+/* Estilos de scrollbar para Chrome/Safari */
+.admin-nav::-webkit-scrollbar {
+    height: 6px;
+}
+
+.admin-nav::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.admin-nav::-webkit-scrollbar-thumb {
+    background: var(--admin-primary);
+    border-radius: 10px;
+}
+
+.admin-nav::-webkit-scrollbar-thumb:hover {
+    background: var(--admin-secondary);
 }
 
 .nav-link {
@@ -5001,5 +5029,949 @@ body {
 @media (max-width: 768px) {
     .caja-resumen {
         grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==========================================
+   FORMULARIO DE INGRESO RÁPIDO
+   ========================================== */
+
+.ingreso-rapido-container {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.05), rgba(46, 204, 113, 0.05));
+    border: 2px solid var(--success-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.ingreso-rapido-container h4 {
+    color: var(--success-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ingreso-rapido-form .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.ingreso-rapido-form .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ingreso-rapido-form .form-field label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.ingreso-rapido-form .form-field input,
+.ingreso-rapido-form .form-field select {
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.ingreso-rapido-form .form-field input:focus,
+.ingreso-rapido-form .form-field select:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.ingreso-rapido-form .form-field-btn {
+    display: flex;
+    align-items: flex-end;
+}
+
+.ingreso-rapido-form .form-field-btn button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+}
+
+/* Subsecciones de Usuarios */
+.subseccion-usuarios {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.subseccion-usuarios:last-child {
+    border-bottom: none;
+}
+
+.subseccion-usuarios h3 {
+    color: var(--admin-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--admin-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ingreso-rapido-form .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .ingreso-rapido-form .form-field-btn button {
+        width: 100%;
+    }
+}
+
+
+/* ==========================================
+   SECCIONES COLAPSABLES
+   ========================================== */
+
+.section-header-collapsible {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--gray-200);
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    user-select: none;
+}
+
+.section-header-collapsible:hover {
+    background: rgba(52, 152, 219, 0.05);
+    border-bottom-color: var(--admin-primary);
+}
+
+.section-header-collapsible h2 {
+    margin: 0;
+    pointer-events: none;
+}
+
+.btn-collapse {
+    background: var(--admin-primary);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    pointer-events: none;
+}
+
+.section-header-collapsible:hover .btn-collapse {
+    background: var(--admin-secondary);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.5);
+}
+
+.btn-collapse i {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.section.collapsed {
+    margin-bottom: 1rem;
+}
+
+.section.collapsed .section-header-collapsible {
+    margin-bottom: 0;
+    padding-bottom: 0.75rem;
+}
+
+.section-content {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .section-header-collapsible {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .btn-collapse {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+}
+
+
+/* ==========================================
+   BOTÓN FLOTANTE TOGGLE ALL
+   ========================================== */
+
+.btn-toggle-all {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    font-size: 1.5rem;
+}
+
+.btn-toggle-all:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 30px rgba(52, 152, 219, 0.6);
+    background: linear-gradient(135deg, var(--admin-secondary), var(--admin-primary));
+}
+
+.btn-toggle-all:active {
+    transform: scale(0.95);
+}
+
+.btn-toggle-all i {
+    transition: transform 0.3s ease;
+}
+
+.btn-toggle-all:hover i {
+    transform: scale(1.2);
+}
+
+/* Animación de pulso */
+@keyframes pulse-toggle {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(52, 152, 219, 0.7);
+    }
+}
+
+.btn-toggle-all {
+    animation: pulse-toggle 3s infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .btn-toggle-all {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.2rem;
+    }
+}
+
+
+/* Estilos para Gestión de Personal */
+.personal-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.personal-tabla-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.personal-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.personal-tabla thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.personal-tabla th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.personal-tabla td {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.personal-tabla tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.badge-activo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-inactivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: #f8d7da;
+    color: #721c24;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-small {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 0.25rem;
+}
+
+.btn-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .personal-tabla-container {
+        overflow-x: scroll;
+    }
+    
+    .personal-tabla {
+        min-width: 800px;
+    }
+}
+
+
+/* Estilos para Solicitudes de Personal */
+.solicitudes-personal-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.solicitudes-personal-container h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.solicitudes-personal-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.solicitud-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid #667eea;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.solicitud-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.solicitud-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.solicitud-header h4 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.solicitud-fecha {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.solicitud-datos p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.solicitud-acciones {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.solicitud-acciones button {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.badge-bloqueado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: #f8d7da;
+    color: #721c24;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Modal de Actividad */
+.large-modal .modal-content {
+    max-width: 800px;
+}
+
+.actividad-filtros {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.actividad-filtros select,
+.actividad-filtros input {
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.actividad-lista {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.actividad-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.actividad-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.actividad-info strong {
+    color: #2c3e50;
+}
+
+.actividad-info span {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.actividad-badge {
+    padding: 0.5rem 1rem;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+
+/* Alinear logo-text a la izquierda en admin */
+.admin-header .logo-text {
+    text-align: left;
+    align-items: flex-start;
+}
+
+.admin-header .logo-text span {
+    text-align: left;
+}
+
+.admin-header .logo-text h1 {
+    text-align: left;
+}
+
+
+/* Wrapper para navegación con scroll */
+.nav-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    position: relative;
+}
+
+/* Botones de scroll de navegación */
+.nav-scroll-btn {
+    background: var(--admin-primary);
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+.nav-scroll-btn:hover {
+    background: var(--admin-secondary);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.nav-scroll-btn:active {
+    transform: scale(0.95);
+}
+
+.nav-scroll-btn i {
+    font-size: 0.9rem;
+}
+
+/* Ocultar botones si no hay scroll */
+.nav-scroll-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Ajustar nav dentro del wrapper */
+.nav-wrapper .admin-nav {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Indicador de más contenido */
+.admin-nav::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.9), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.admin-nav.has-scroll::after {
+    opacity: 1;
+}
+
+/* Responsive para nav wrapper */
+@media (max-width: 1200px) {
+    .nav-wrapper {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-scroll-btn {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .nav-scroll-btn i {
+        font-size: 0.8rem;
+    }
+}
+
+
+/* Logo-text en la parte superior */
+.admin-header .logo-section {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.admin-header .logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.admin-header .logo-text span {
+    order: 1;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.admin-header .logo-text h1 {
+    order: 2;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.admin-header .nav-wrapper {
+    width: 100%;
+}
+
+
+/* Asegurar que el header esté siempre en el tope absoluto */
+.admin-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 99999 !important;
+    margin: 0 !important;
+}
+
+/* Los modales deben estar debajo del header */
+.modal {
+    z-index: 9000 !important;
+    padding-top: 140px;
+}
+
+/* Ajustar contenido de modales para que no quede detrás del header */
+.modal-content {
+    margin-top: 20px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+}
+
+/* Body con padding para el header fijo */
+body {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+
+/* Eliminar espacios en el tope de la página */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Header pegado al tope absoluto sin espacios */
+.admin-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.admin-header .container {
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* Logo y nav sin espacios superiores */
+.admin-header .logo-section {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.admin-header .nav-wrapper {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Reducir padding del main-content */
+.main-content {
+    padding-top: 110px !important;
+}
+
+
+/* Estilos para Generación de Códigos de Acceso */
+.codigos-acceso-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.codigos-acceso-container h3 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+#codigos-generados-lista {
+    margin-top: 1.5rem;
+}
+
+
+/* ==========================================
+   GESTIÓN DE INFORMACIÓN DE CONTACTO
+   ========================================== */
+
+.contacto-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.contacto-preview .preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: #2c3e50;
+}
+
+.contacto-preview .preview-item i {
+    color: #667eea;
+    font-size: 1.1rem;
+    width: 20px;
+}
+
+.contacto-preview .preview-item span {
+    font-weight: 500;
+}
+
+/* Formulario de contacto en modal */
+.form-section {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.form-section h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.form-section h4 i {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group input[type="time"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Responsive para formulario de contacto */
+@media (max-width: 768px) {
+    .form-section {
+        padding: 0.75rem;
+    }
+    
+    #contacto-modal .modal-content {
+        max-width: 95% !important;
+        margin: 1rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column !important;
+    }
+    
+    .modal-actions button {
+        width: 100% !important;
+    }
+}
+
+
+/* ==========================================
+   HEADER ACTIONS Y SESIÓN
+   ========================================== */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.admin-info i {
+    font-size: 1.1rem;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn-logout i {
+    font-size: 1rem;
+}
+
+/* Toggle password en modales */
+.input-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+    padding: 0.5rem;
+}
+
+.toggle-password:hover {
+    color: #667eea;
+}
+
+/* Responsive para header actions */
+@media (max-width: 768px) {
+    .header-actions {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        flex-direction: column;
+        z-index: 1000;
+    }
+
+    .admin-info {
+        order: 2;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .btn-logout {
+        order: 1;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .btn-logout span {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-info span {
+        display: none;
+    }
+    
+    .admin-info {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
     }
 }
